@@ -1,0 +1,50 @@
+# Secrets — NEVER commit these
+.env
+.env.local
+.env*.local
+*.pem
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Prisma — keep migrations, ignore local db
+prisma/*.db
+prisma/*.db-journal
+
+# Private planning — spec, project brain, session log. Local only, never pushed.
+/planing/
+/CLAUDE.md
