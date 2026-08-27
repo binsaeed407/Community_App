@@ -47,4 +47,4 @@ prisma/*.db-journal
 
 # Private planning — spec, project brain, session log. Local only, never pushed.
 /planing/
-/CLAUDE.md
+CLAUDE.md
