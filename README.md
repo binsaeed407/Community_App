@@ -58,12 +58,17 @@ npm install
 ```
 
 Copy the example environment file and fill in your own database connection
-string (a free Postgres database from [Neon](https://neon.tech) works — use the
-**pooled** string):
+strings. A free Postgres database from [Neon](https://neon.tech) works:
 
 ```bash
 cp .env.example .env
 ```
+
+Neon gives you two connection strings for the same database, and both are
+needed. `DATABASE_URL` is the **pooled** one (its host contains `-pooler`) and
+is what the app uses at runtime. `DIRECT_URL` is the same URL **without**
+`-pooler`, and is used only for migrations — the connection pooler does not
+support the locks that schema changes need.
 
 Create the tables and add a row to check the connection:
 
