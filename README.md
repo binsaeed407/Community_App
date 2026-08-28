@@ -57,19 +57,40 @@ cd Community_App
 npm install
 ```
 
-Copy the example environment file and fill in your own database connection string:
+Copy the example environment file and fill in your own database connection
+string (a free Postgres database from [Neon](https://neon.tech) works — use the
+**pooled** string):
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Then:
+Create the tables and add a row to check the connection:
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+Then start the app:
 
 ```bash
 npm run dev
 ```
 
-The app runs at http://localhost:3000.
+The app runs at http://localhost:3000, and http://localhost:3000/health confirms
+the database connection is working.
+
+### Useful commands
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Production build (also type-checks) |
+| `npm run lint` | Run ESLint |
+| `npm run db:migrate` | Apply schema changes to the database |
+| `npm run db:seed` | Insert the health-check row |
+| `npm run db:studio` | Browse the database in a GUI |
 
 ---
 
