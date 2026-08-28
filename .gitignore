@@ -53,3 +53,15 @@ prisma/*.db-journal
 # Private planning — spec, project brain, session log. Local only, never pushed.
 /planing/
 CLAUDE.md
+
+/src/generated/prisma
+
+# Prisma generated client — rebuilt by `prisma generate` on every install/build
+/src/generated/
+
+# Prisma CLI agent skill packs — vendored docs auto-created by `prisma init`,
+# not our code. Kept locally for tooling, kept out of the repo.
+/.agents/
+/.windsurf/
+/.claude/skills/
+skills-lock.json
