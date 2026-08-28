@@ -10,6 +10,14 @@ type Result =
   | { ok: false; error: string };
 
 async function checkDatabase(): Promise<Result> {
+  if (!process.env.DATABASE_URL) {
+    return {
+      ok: false,
+      error:
+        "DATABASE_URL is not set. Locally, copy .env.example to .env. On Vercel, add it under Settings -> Environment Variables and redeploy.",
+    };
+  }
+
   try {
     const [latest, count] = await Promise.all([
       db.healthCheck.findFirst({ orderBy: { createdAt: "desc" } }),
