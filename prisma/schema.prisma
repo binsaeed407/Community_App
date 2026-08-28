@@ -1,0 +1,21 @@
+// Prisma schema — the single description of every table in the database.
+// Run `npx prisma migrate dev` after changing this file to update the database.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Phase 0 only. This model exists to prove the chain
+/// app -> Prisma -> Neon actually works end to end.
+/// It is deleted in Phase 1 when the real models arrive.
+model HealthCheck {
+  id        String   @id @default(cuid())
+  message   String
+  createdAt DateTime @default(now())
+}
