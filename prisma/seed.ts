@@ -47,17 +47,25 @@ const CATEGORIES = [
   { slug: "other", name: "Something else", icon: "❓", sortOrder: 8 },
 ];
 
+/**
+ * The accounts the demo runs on.
+ *
+ * The two "demo-" accounts are the published logins. The rest are ordinary
+ * residents who exist so that reports have more than one owner.
+ *
+ * That matters more than it sounds. When demo-citizen reported all fifteen
+ * issues, signing in as them showed every report in the system under "My
+ * reports". The filter was correct — the data made it look broken, which for
+ * something whose whole subject is trust is just as bad.
+ */
 const USERS = [
-  {
-    email: "demo-citizen@example.com",
-    displayName: "Demo Citizen",
-    role: "CITIZEN" as const,
-  },
-  {
-    email: "demo-admin@example.com",
-    displayName: "Demo Administrator",
-    role: "ADMIN" as const,
-  },
+  { key: "demo", email: "demo-citizen@example.com", displayName: "Demo Citizen", role: "CITIZEN" as const },
+  { key: "admin", email: "demo-admin@example.com", displayName: "Demo Administrator", role: "ADMIN" as const },
+  { key: "aisha", email: "aisha.rahman@example.com", displayName: "Aisha R.", role: "CITIZEN" as const },
+  { key: "tom", email: "tom.whitfield@example.com", displayName: "Tom W.", role: "CITIZEN" as const },
+  { key: "priya", email: "priya.nair@example.com", displayName: "Priya N.", role: "CITIZEN" as const },
+  { key: "marcus", email: "marcus.obi@example.com", displayName: "Marcus O.", role: "CITIZEN" as const },
+  { key: "grace", email: "grace.lindqvist@example.com", displayName: "Grace L.", role: "CITIZEN" as const },
 ];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -79,7 +87,8 @@ async function main() {
   }
   console.log(`Categories: ${CATEGORIES.length}`);
 
-  for (const user of USERS) {
+  for (const { key, ...user } of USERS) {
+    void key;
     await db.user.upsert({
       where: { email: user.email },
       // Re-seeding resets the demo password, which is what you want after
@@ -88,15 +97,19 @@ async function main() {
       update: { ...user, passwordHash },
     });
   }
-  console.log(`Users: ${USERS.map((u) => u.email).join(", ")}`);
+  console.log(`Users: ${USERS.length} (${USERS.filter((u) => u.role === "CITIZEN").length} residents)`);
 
   // Look up the ids the issues need, once, rather than per row.
   const categoryIdBySlug = new Map(
     (await db.category.findMany({ select: { id: true, slug: true } })).map((c) => [c.slug, c.id]),
   );
-  const citizen = await db.user.findUniqueOrThrow({ where: { email: USERS[0].email } });
-  const admin = await db.user.findUniqueOrThrow({ where: { email: USERS[1].email } });
-  const actorId: Record<Actor, string> = { citizen: citizen.id, admin: admin.id };
+  // Map the short key used in the issue data to a real user id.
+  const userIdByKey = new Map<string, string>();
+  for (const user of USERS) {
+    const row = await db.user.findUniqueOrThrow({ where: { email: user.email }, select: { id: true } });
+    userIdByKey.set(user.key, row.id);
+  }
+  const admin = { id: userIdByKey.get("admin") as string };
 
   let historyRows = 0;
   let auditRows = 0;
@@ -104,6 +117,13 @@ async function main() {
   for (const issue of SEED_ISSUES) {
     const categoryId = categoryIdBySlug.get(issue.categorySlug);
     if (!categoryId) throw new Error(`Unknown category slug: ${issue.categorySlug}`);
+
+    const reporterId = userIdByKey.get(issue.reporter);
+    if (!reporterId) throw new Error(`Unknown reporter key: ${issue.reporter}`);
+
+    // "citizen" in a timeline step means the person who filed THIS report, not
+    // one shared demo account — so a reopen is attributed to the right resident.
+    const actorId: Record<Actor, string> = { citizen: reporterId, admin: admin.id };
 
     const reportedAt = daysAgo(issue.reportedDaysAgo);
     const stepDate = (afterDays: number) => new Date(reportedAt.getTime() + afterDays * DAY_MS);
@@ -123,7 +143,7 @@ async function main() {
         longitude: issue.longitude,
         addressLabel: issue.addressLabel,
         categoryId,
-        reporterId: citizen.id,
+        reporterId,
         // The cache. Always the status of the final timeline step.
         status: lastStep.status,
         createdAt: reportedAt,

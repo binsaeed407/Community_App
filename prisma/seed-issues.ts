@@ -24,6 +24,15 @@ export type TimelineStep = {
 
 export type SeedIssue = {
   id: string;
+  /**
+   * Which seeded resident filed this.
+   *
+   * Reports are spread across several people on purpose. When one account owned
+   * all fifteen, signing in as that account showed every report in the system
+   * under "My reports" — the filter was correct, but the data made it look like
+   * a privacy leak, which for a demo is just as damaging.
+   */
+  reporter: string;
   title: string;
   description: string;
   categorySlug: string;
@@ -40,6 +49,7 @@ const REPORTED = "Reported by a resident.";
 export const SEED_ISSUES: SeedIssue[] = [
   {
     id: "seed-issue-01",
+    reporter: "demo",
     title: "Deep pothole outside the library",
     description:
       "There is a pothole roughly half a metre across on the northbound side, right where cyclists pull in. It has been getting worse since the cold snap and a cyclist came off in it last week.",
@@ -72,6 +82,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-02",
+    reporter: "aisha",
     title: "Street light out for three weeks",
     description:
       "The light outside number 44 has been dark since the start of the month. The stretch between the bus stop and the corner is now completely unlit and it feels unsafe walking home.",
@@ -99,6 +110,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-03",
+    reporter: "demo",
     title: "Fly-tipping behind the parade of shops",
     description:
       "Someone has dumped a sofa, two mattresses and several bags of building waste in the service alley. It has been there over a week and is starting to attract rats.",
@@ -138,6 +150,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-04",
+    reporter: "tom",
     title: "Paving slabs lifted by tree roots",
     description:
       "Three slabs outside the chemist have been pushed up by a good five centimetres. My neighbour uses a walking frame and cannot get past without stepping into the road.",
@@ -166,6 +179,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-05",
+    reporter: "priya",
     title: "Graffiti tags along the railway wall",
     description:
       "A long run of tagging has appeared along the wall by the bridge, maybe thirty metres of it. Not offensive, just very visible on the walk to the station.",
@@ -187,6 +201,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-06",
+    reporter: "aisha",
     title: "Blocked drain flooding the crossing",
     description:
       "Every time it rains the gully by the crossing backs up and the whole corner floods ankle-deep. Buses going past soak anyone waiting to cross.",
@@ -221,6 +236,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-07",
+    reporter: "demo",
     title: "Broken glass across the playground",
     description:
       "Someone has smashed bottles across the toddler play area overnight. There is glass in the bark chippings under the climbing frame.",
@@ -247,6 +263,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-08",
+    reporter: "marcus",
     title: "Road surface breaking up at the junction",
     description:
       "The whole approach to the junction is crazed and crumbling. Bits of loose tarmac are being flicked up by passing traffic.",
@@ -267,6 +284,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-09",
+    reporter: "priya",
     title: "Bins not collected on the high street",
     description:
       "The public bins outside the market have been overflowing since the weekend and there is litter blowing down the street.",
@@ -287,6 +305,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-10",
+    reporter: "tom",
     title: "Light flickering all night",
     description:
       "The lamp opposite the park gate flickers constantly from dusk until morning. It is not out, but it strobes and it is genuinely unpleasant to walk under.",
@@ -313,6 +332,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-11",
+    reporter: "grace",
     title: "Pavement blocked by an overgrown hedge",
     description:
       "A hedge from one of the front gardens has grown right across the footway. Pushchairs and wheelchairs have to go into the road to get past.",
@@ -334,6 +354,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-12",
+    reporter: "marcus",
     title: "Offensive graffiti on the shop shutters",
     description:
       "Racist graffiti has been sprayed on the shutters of the corner shop. The owner is understandably upset and would like it gone before he opens.",
@@ -361,6 +382,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-13",
+    reporter: "demo",
     title: "Fallen branch blocking the path",
     description:
       "A large branch came down in the wind and is lying across the main path through the common. People are walking around it over the grass, which is churning up.",
@@ -381,6 +403,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-14",
+    reporter: "grace",
     title: "Car parked across the dropped kerb",
     description:
       "A car is parked half on the pavement outside the flats most evenings and blocks the dropped kerb entirely.",
@@ -402,6 +425,7 @@ export const SEED_ISSUES: SeedIssue[] = [
   },
   {
     id: "seed-issue-15",
+    reporter: "aisha",
     title: "Standing water outside the school gates",
     description:
       "There is a permanent puddle across the whole width of the pavement at the school entrance. Children are walking in the road to avoid it at drop-off time.",
