@@ -47,6 +47,8 @@ model User {
 
   role      Role     @default(CITIZEN)
   createdAt DateTime @default(now())
+
+  reportedIssues Issue[]
 }
 
 // ---------------------------------------------------------------------------
@@ -67,4 +69,61 @@ model Category {
 
   /// Controls the order categories appear in the report form's dropdown.
   sortOrder Int @default(0)
+
+  issues Issue[]
+}
+
+// ---------------------------------------------------------------------------
+// Issues
+// ---------------------------------------------------------------------------
+
+enum IssueStatus {
+  SUBMITTED
+  ACKNOWLEDGED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  REOPENED
+}
+
+model Issue {
+  id          String @id @default(cuid())
+  title       String
+  description String
+
+  /// Stored as two plain floats rather than PostGIS geometry. The only distance
+  /// question this app asks is "are these two reports near each other", which a
+  /// bounding box answers well enough at city scale, and this keeps the schema
+  /// readable and the database portable.
+  latitude  Float
+  longitude Float
+
+  /// What the reporter typed to describe where it is, e.g. "Camberwell Road,
+  /// near the library". Never a full home address.
+  addressLabel String
+
+  /// A cache of the most recent IssueStatusHistory row, NOT the source of truth.
+  ///
+  /// The history table is authoritative. This column exists so that filtering
+  /// ("show me every open issue") is one indexed lookup instead of a correlated
+  /// subquery against the history table for every row.
+  ///
+  /// The rule that keeps it honest: this is only ever written inside the same
+  /// transaction as the history row it mirrors, and never on its own. A test
+  /// asserts the two can never disagree.
+  status IssueStatus @default(SUBMITTED)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  reporterId String
+  reporter   User   @relation(fields: [reporterId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Serves the admin dashboard's status buckets and the public "newest first" list.
+  @@index([status, createdAt])
+  /// Serves the category filter on the public list.
+  @@index([categoryId])
 }
