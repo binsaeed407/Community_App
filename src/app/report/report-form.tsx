@@ -1,12 +1,28 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useFormStatus } from "react-dom";
 import { MAP_DEFAULT_CENTRE, type Coordinates } from "@/lib/constants";
 import { DESCRIPTION_MAX, TITLE_MAX } from "@/lib/validation/issue";
 import { createIssueAction, emptyReportState } from "./actions";
 
 export type CategoryOption = { id: string; name: string; icon: string };
+
+/**
+ * Leaflet reads `window` when the module is imported, so importing it on the
+ * server throws before anything renders. ssr:false makes this the one part of
+ * the page that is browser-only; everything around it still renders server-side.
+ */
+const LocationPicker = dynamic(
+  () => import("@/components/map/location-picker").then((m) => m.LocationPicker),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[320px] w-full animate-pulse rounded-md border border-neutral-300 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900" />
+    ),
+  },
+);
 
 const inputClass =
   "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100";
@@ -43,6 +59,14 @@ export function ReportForm({ categories }: { categories: CategoryOption[] }) {
   const [position, setPosition] = useState<Coordinates>(MAP_DEFAULT_CENTRE);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [categoryId, setCategoryId] = useState("");
+
+  // The pin wears the chosen category icon, so the map reflects the rest of
+  // the form rather than sitting beside it.
+  const pinEmoji = useMemo(
+    () => categories.find((c) => c.id === categoryId)?.icon ?? "📍",
+    [categories, categoryId],
+  );
 
   function useMyLocation() {
     if (!navigator.geolocation) {
@@ -90,7 +114,8 @@ export function ReportForm({ categories }: { categories: CategoryOption[] }) {
           id="categoryId"
           name="categoryId"
           required
-          defaultValue=""
+          value={categoryId}
+          onChange={(event) => setCategoryId(event.target.value)}
           aria-describedby={fieldErrors.categoryId ? "categoryId-error" : undefined}
           aria-invalid={Boolean(fieldErrors.categoryId)}
           className={inputClass}
@@ -173,6 +198,13 @@ export function ReportForm({ categories }: { categories: CategoryOption[] }) {
           </p>
           <FieldError id="addressLabel-error" messages={fieldErrors.addressLabel} />
         </div>
+
+        <LocationPicker position={position} onPick={setPosition} emoji={pinEmoji} />
+
+        <p className="text-xs text-neutral-500">
+          Click the map or drag the pin to place it exactly. If you would rather not, the street
+          name above is enough.
+        </p>
 
         <div className="flex flex-wrap items-center gap-3">
           <button
