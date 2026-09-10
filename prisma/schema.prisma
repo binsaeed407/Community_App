@@ -53,6 +53,8 @@ model User {
   /// has exactly one per issue they reported (the initial SUBMITTED row).
   statusChanges IssueStatusHistory[]
 
+  uploads Attachment[]
+
 }
 
 // ---------------------------------------------------------------------------
@@ -129,6 +131,10 @@ model Issue {
   /// Every status this issue has ever been in, oldest first. Append-only.
   history IssueStatusHistory[]
 
+  /// Photos: what the citizen reported, and what the admin used as proof of
+  /// resolution.
+  attachments Attachment[]
+
   /// Serves the admin dashboard's status buckets and the public "newest first" list.
   @@index([status, createdAt])
   /// Serves the category filter on the public list.
@@ -170,4 +176,42 @@ model IssueStatusHistory {
   /// Serves the timeline on the issue detail page, and the "what is the current
   /// status" lookup used to verify the cache on Issue.
   @@index([issueId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Photos
+// ---------------------------------------------------------------------------
+
+/// Which side of the story a photo tells.
+enum AttachmentKind {
+  /// Uploaded by the citizen when reporting the problem.
+  REPORT
+  /// Uploaded by an administrator as proof the problem was actually fixed.
+  EVIDENCE
+}
+
+/// Image files live in Cloudinary, not in Postgres. The database only keeps the
+/// URL and the public id, because storing megabytes of binary in a row makes
+/// every query that touches the table slower and the backups enormous.
+///
+/// The public id is kept alongside the URL so a file can still be deleted or
+/// transformed later; a bare URL would strand the asset.
+model Attachment {
+  id String @id @default(cuid())
+
+  issueId String
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  url                String
+  cloudinaryPublicId String
+
+  kind AttachmentKind @default(REPORT)
+
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  /// Serves "show me the evidence photo for this issue" on the detail page.
+  @@index([issueId, kind])
 }
