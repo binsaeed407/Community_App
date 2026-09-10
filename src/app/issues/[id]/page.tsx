@@ -9,6 +9,7 @@ import { ReopenForm } from "@/components/reopen-form";
 import { getSessionUser } from "@/lib/guards";
 import { canTransition } from "@/lib/transitions";
 import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
+import { Card, Container, cx } from "@/components/ui";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const issue = await getIssue((await params).id);
@@ -18,6 +19,36 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title: issue.title,
     description: issue.description.slice(0, 160),
   };
+}
+
+function Photos({
+  photos,
+  label,
+  alt,
+}: {
+  photos: { id: string; url: string }[];
+  label: string;
+  alt: string;
+}) {
+  if (photos.length === 0) return null;
+
+  return (
+    <section className="mt-8">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-faint">{label}</h2>
+      <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+        {photos.map((photo) => (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            key={photo.id}
+            src={photo.url}
+            alt={alt}
+            className="aspect-[4/3] w-full rounded-lg border border-line object-cover"
+            loading="lazy"
+          />
+        ))}
+      </div>
+    </section>
+  );
 }
 
 /**
@@ -44,118 +75,103 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
   const evidencePhotos = issue.attachments.filter((a) => a.kind === "EVIDENCE");
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
-      <Link
-        href="/issues"
-        className="text-sm text-neutral-600 underline transition hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-      >
+    <Container size="prose" className="flex-1 py-10">
+      <Link href="/issues" className="text-sm text-ink-soft transition-colors hover:text-ink">
         ← All issues
       </Link>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-2">
         <StatusBadge status={issue.status} />
-        {overdue ? <OverdueBadge /> : null}
-        <span className="text-sm text-neutral-500">
+        {overdue ? <OverdueBadge days={age - OVERDUE_AFTER_DAYS} /> : null}
+        <span className="text-sm text-ink-faint">
           <span aria-hidden="true">{issue.category.icon}</span> {issue.category.name}
         </span>
       </div>
 
-      <h1 className="mt-3 text-3xl font-bold tracking-tight">{issue.title}</h1>
+      <h1 className="mt-3 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+        {issue.title}
+      </h1>
 
-      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-        Reported by <span className="font-medium">{issue.reporter.displayName}</span> on{" "}
-        <time dateTime={issue.createdAt.toISOString()}>{formatDate(issue.createdAt)}</time>
-        {" · "}
+      <p className="mt-2.5 text-sm text-ink-soft">
+        Reported by <span className="font-medium text-ink">{issue.reporter.displayName}</span> on{" "}
+        <time dateTime={issue.createdAt.toISOString()}>{formatDate(issue.createdAt)}</time> ·{" "}
         {issue.addressLabel}
       </p>
 
       {/*
         Says what the current status means in a sentence. "Acknowledged" is
         jargon to somebody who just wants to know whether their pothole is
-        getting fixed.
+        getting fixed, and an app about accountability should not need decoding.
       */}
-      <p className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <span className="font-medium">{STATUS_LABEL[issue.status]}.</span>{" "}
-        {STATUS_DESCRIPTION[issue.status]}
-        {overdue ? (
-          <>
-            {" "}
-            This has been open for {age} days, which is past the {OVERDUE_AFTER_DAYS}-day target.
-          </>
-        ) : isOpen(issue.status) ? (
-          <> Open for {age} day{age === 1 ? "" : "s"}.</>
-        ) : null}
-      </p>
+      <Card
+        tone={overdue ? "alert" : "sunken"}
+        className={cx("mt-6 border-l-4 p-4", !overdue && "border-l-accent")}
+      >
+        <p className="text-sm leading-relaxed">
+          <span className="font-semibold">{STATUS_LABEL[issue.status]}.</span>{" "}
+          <span className="text-ink-soft">{STATUS_DESCRIPTION[issue.status]}</span>
+          {overdue ? (
+            <span className="text-ink-soft">
+              {" "}
+              Open for {age} days, which is {age - OVERDUE_AFTER_DAYS} past the{" "}
+              {OVERDUE_AFTER_DAYS}-day target.
+            </span>
+          ) : isOpen(issue.status) ? (
+            <span className="text-ink-soft">
+              {" "}
+              Open for {age} day{age === 1 ? "" : "s"}.
+            </span>
+          ) : null}
+        </p>
+      </Card>
 
       <section className="mt-8">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-faint">
           What was reported
         </h2>
-        <p className="mt-2 whitespace-pre-line leading-relaxed">{issue.description}</p>
+        <p className="prose-body mt-2.5 whitespace-pre-line text-[15px]">{issue.description}</p>
       </section>
 
-      {reportPhotos.length > 0 ? (
-        <section className="mt-8">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">
-            Photos from the report
-          </h2>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {reportPhotos.map((photo) => (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                key={photo.id}
-                src={photo.url}
-                alt="Photo submitted with this report"
-                className="aspect-square w-full rounded-md object-cover"
-                loading="lazy"
-              />
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <Photos
+        photos={reportPhotos}
+        label="Photos from the report"
+        alt="Submitted with this report"
+      />
+      <Photos
+        photos={evidencePhotos}
+        label="Evidence the work was done"
+        alt="Submitted as evidence that this issue was resolved"
+      />
 
-      {evidencePhotos.length > 0 ? (
-        <section className="mt-8">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">
-            Evidence the work was done
-          </h2>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {evidencePhotos.map((photo) => (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                key={photo.id}
-                src={photo.url}
-                alt="Photo submitted as evidence that this issue was resolved"
-                className="aspect-square w-full rounded-md object-cover"
-                loading="lazy"
-              />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">What has happened since</h2>
-        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+      <section className="mt-12 border-t border-line pt-8">
+        <h2 className="text-xl font-semibold tracking-tight">What has happened since</h2>
+        <p className="mt-1.5 text-sm text-ink-soft">
           Every change to this report, in order, with the reason given at the time. Entries are
-          added, never edited or removed.
+          added — never edited, never removed.
         </p>
+
         <IssueTimeline history={issue.history} />
 
         {canReopen ? (
-          <div className="mt-6">
+          <div className="mt-8">
             <ReopenForm issueId={issue.id} />
           </div>
         ) : null}
       </section>
 
-      <section className="mt-8">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">Location</h2>
+      <section className="mt-10 border-t border-line pt-6">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-faint">
+          Location
+        </h2>
         <p className="mt-2 text-sm">{issue.addressLabel}</p>
-        <p className="mt-1 font-mono text-xs text-neutral-500">
+        <p className="mt-1 font-mono text-xs text-ink-faint">
           {issue.latitude.toFixed(5)}, {issue.longitude.toFixed(5)}
+          {" · "}
+          <Link href="/issues/map" className="text-accent hover:underline">
+            see it on the map
+          </Link>
         </p>
       </section>
-    </main>
+    </Container>
   );
 }
