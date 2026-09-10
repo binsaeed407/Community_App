@@ -28,6 +28,27 @@ export const authConfig = {
 
   callbacks: {
     /**
+     * Runs in middleware, before the page does. Returning false sends the
+     * visitor to the sign-in page with a callback back to where they were
+     * going, so signing in resumes the journey instead of dumping them home.
+     *
+     * This is routing, not authorisation. It stops a logged-out visitor
+     * navigating to a protected page; it does nothing about someone posting
+     * straight to a server action. That is what the guards in `guards.ts` are
+     * for, and they are called regardless of what happens here.
+     */
+    authorized({ auth, request }) {
+      const user = auth?.user;
+      if (!user) return false;
+
+      if (request.nextUrl.pathname.startsWith("/admin")) {
+        return user.role === "ADMIN";
+      }
+
+      return true;
+    },
+
+    /**
      * Copy the role and id onto the token at sign-in, so later requests can
      * read them without touching the database.
      *
