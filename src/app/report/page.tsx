@@ -1,5 +1,6 @@
 import { listCategories } from "@/lib/issues";
 import { requireUser } from "@/lib/guards";
+import { isCloudinaryConfigured } from "@/lib/cloudinary";
 import { ReportForm } from "./report-form";
 
 export const metadata = {
@@ -25,7 +26,7 @@ export default async function ReportPage() {
         happens to it.
       </p>
 
-      <ReportForm categories={categories} />
+      <ReportForm categories={categories} uploadsEnabled={isCloudinaryConfigured()} />
     </main>
   );
 }

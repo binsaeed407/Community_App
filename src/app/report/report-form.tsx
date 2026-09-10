@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useFormStatus } from "react-dom";
 import { MAP_DEFAULT_CENTRE, type Coordinates } from "@/lib/constants";
 import { DESCRIPTION_MAX, TITLE_MAX } from "@/lib/validation/issue";
+import { PhotoUpload } from "@/components/upload/photo-upload";
 import { createIssueAction, emptyReportState } from "./actions";
 
 export type CategoryOption = { id: string; name: string; icon: string };
@@ -49,7 +50,13 @@ function FieldError({ id, messages }: { id: string; messages?: string[] }) {
   );
 }
 
-export function ReportForm({ categories }: { categories: CategoryOption[] }) {
+export function ReportForm({
+  categories,
+  uploadsEnabled,
+}: {
+  categories: CategoryOption[];
+  uploadsEnabled: boolean;
+}) {
   const [state, formAction] = useActionState(createIssueAction, emptyReportState);
   const { fieldErrors } = state;
 
@@ -233,6 +240,16 @@ export function ReportForm({ categories }: { categories: CategoryOption[] }) {
 
         <FieldError id="latitude-error" messages={fieldErrors.latitude} />
         <FieldError id="longitude-error" messages={fieldErrors.longitude} />
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+        <legend className="px-1 text-sm font-medium">Photos</legend>
+        <p className="text-xs text-neutral-500">
+          A photo makes a report far harder to dismiss. Please avoid including faces or number
+          plates — this is published publicly.
+        </p>
+        <PhotoUpload disabled={!uploadsEnabled} />
+        <FieldError id="photos-error" messages={fieldErrors.photos} />
       </fieldset>
 
       <div>
