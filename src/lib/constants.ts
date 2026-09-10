@@ -24,7 +24,9 @@ export const ISSUES_PER_PAGE = 12;
  * Trafalgar Square. Any London point would do; this one is recognisable enough
  * that a reviewer immediately understands the demo is set in London.
  */
-export const MAP_DEFAULT_CENTRE = { latitude: 51.5074, longitude: -0.1278 } as const;
+export type Coordinates = { latitude: number; longitude: number };
+
+export const MAP_DEFAULT_CENTRE: Coordinates = { latitude: 51.5074, longitude: -0.1278 };
 
 /** Zoom level that shows a few streets rather than a whole city. */
 export const MAP_DEFAULT_ZOOM = 13;
