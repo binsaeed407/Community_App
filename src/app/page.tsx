@@ -16,7 +16,7 @@ export default async function Home() {
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 px-6 py-16">
       <div>
         <p className="text-sm font-medium uppercase tracking-widest text-neutral-500">
-          Work in progress
+          Civic reporting, with receipts
         </p>
         <h1 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Community App</h1>
       </div>
@@ -35,18 +35,23 @@ export default async function Home() {
       </div>
 
       <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-5 text-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <p className="font-medium text-neutral-900 dark:text-neutral-100">What works so far</p>
+        <p className="font-medium text-neutral-900 dark:text-neutral-100">How it works</p>
         <ul className="mt-3 space-y-1.5 text-neutral-600 dark:text-neutral-400">
           <li>
-            <span aria-hidden="true">✅</span> The database: issues, append-only status history,
-            audit log — seeded with 15 sample reports across London
+            <span aria-hidden="true">1.</span> Anyone can browse every report, as a list or on a
+            map. No account needed.
           </li>
           <li>
-            <span aria-hidden="true">✅</span> Accounts, sign-in and roles
+            <span aria-hidden="true">2.</span> Sign in to report a problem, with a photo and a pin
+            on the map.
           </li>
           <li>
-            <span aria-hidden="true">⏳</span> Reporting a problem, the map and the public issue
-            list — building now
+            <span aria-hidden="true">3.</span> An administrator has to give a reason for every
+            change, and a photo to close it.
+          </li>
+          <li>
+            <span aria-hidden="true">4.</span> If it is not actually fixed, the person who
+            reported it can reopen it — and the original claim stays on the record.
           </li>
         </ul>
       </div>
@@ -65,6 +70,13 @@ export default async function Home() {
             Sign in with a demo account
           </Link>
         )}
+
+        <Link
+          href="/issues"
+          className="rounded-md border border-neutral-300 px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+        >
+          Browse reports
+        </Link>
 
         <Link
           href="/health"
