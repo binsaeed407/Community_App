@@ -19,3 +19,52 @@ model HealthCheck {
   message   String
   createdAt DateTime @default(now())
 }
+
+// ---------------------------------------------------------------------------
+// People
+// ---------------------------------------------------------------------------
+
+/// Who someone is allowed to be. The PRD describes separate Moderator and
+/// System Admin roles; both are collapsed into ADMIN for now because a demo has
+/// no real second tier. The enum is the place to split them later.
+enum Role {
+  CITIZEN
+  ADMIN
+}
+
+model User {
+  id String @id @default(cuid())
+
+  /// Used to sign in, and never rendered publicly. Everything the public sees
+  /// uses displayName instead, so reporting a problem cannot expose an email.
+  email String @unique
+
+  /// A bcrypt hash. The plain password is never stored, logged, or returned.
+  passwordHash String
+
+  /// The only identity shown on a public page.
+  displayName String
+
+  role      Role     @default(CITIZEN)
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Categories
+// ---------------------------------------------------------------------------
+
+/// Categories live in the database rather than in a TypeScript enum so an
+/// administrator could add one without a redeploy, and so an issue keeps a real
+/// foreign key rather than a loose string.
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  /// A single emoji, used as the map marker and the list icon. Cheaper and more
+  /// portable than shipping an icon set for eight categories.
+  icon String
+
+  /// Controls the order categories appear in the report form's dropdown.
+  sortOrder Int @default(0)
+}
