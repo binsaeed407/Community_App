@@ -13,37 +13,74 @@
  * status colours, because in this app colour means something — a badge is the
  * difference between "we are working on it" and "we closed it". A decorative
  * brand colour competing with those would make the meaningful ones quieter.
+ *
+ * ---------------------------------------------------------------------------
+ * Why the values are indirected through a second set of variables:
+ *
+ * `@theme` is not a normal CSS rule. Tailwind reads it at build time to decide
+ * which utilities to generate, and it collapses to a single set of values — so
+ * an `@theme` block nested inside `@media (prefers-color-scheme: dark)` does
+ * NOT produce a media-scoped override. It just overwrites the light values, and
+ * the whole app ships in dark colours regardless of the visitor's setting.
+ *
+ * That is not a hypothetical: it is what this file did, and it reached
+ * production before the built stylesheet was checked and found to contain
+ * exactly one definition of `--color-paper`, the dark one.
+ *
+ * So `@theme` points at plain custom properties, and those are what the media
+ * query swaps. Tailwind emits `color: var(--color-ink)`, `--color-ink` resolves
+ * to `var(--app-ink)`, and that resolves per media query at runtime — which is
+ * where the decision actually belongs.
  */
 @theme {
-  /* Surfaces, warm rather than pure grey. Pure #fff under a lot of text reads
-     clinical; a few degrees of warmth reads like paper. */
-  --color-paper: #fbfaf8;
-  --color-surface: #ffffff;
-  --color-surface-sunken: #f4f2ef;
-  --color-line: #e6e3dd;
-  --color-line-strong: #d3cfc7;
+  --color-paper: var(--app-paper);
+  --color-surface: var(--app-surface);
+  --color-surface-sunken: var(--app-surface-sunken);
+  --color-line: var(--app-line);
+  --color-line-strong: var(--app-line-strong);
 
-  /* Text. Not pure black: #111 against white is sharp enough to read and soft
-     enough not to buzz. */
-  --color-ink: #16161a;
-  --color-ink-soft: #55555f;
-  --color-ink-faint: #85858f;
+  --color-ink: var(--app-ink);
+  --color-ink-soft: var(--app-ink-soft);
+  --color-ink-faint: var(--app-ink-faint);
 
-  /* The one accent. Links, focus rings, and the active state of a control. */
-  --color-accent: #0f766e;
-  --color-accent-soft: #e6f2f1;
-  --color-accent-strong: #115e59;
+  --color-accent: var(--app-accent);
+  --color-accent-soft: var(--app-accent-soft);
+  --color-accent-strong: var(--app-accent-strong);
 
   --radius-card: 0.75rem;
   --radius-control: 0.5rem;
 
-  /* Shadows are barely there on purpose. This is a document, not a dashboard
-     from 2014. */
-  --shadow-card: 0 1px 2px rgb(22 22 26 / 0.04), 0 1px 3px rgb(22 22 26 / 0.06);
-  --shadow-raised: 0 2px 4px rgb(22 22 26 / 0.04), 0 6px 16px rgb(22 22 26 / 0.08);
+  --shadow-card: var(--app-shadow-card);
+  --shadow-raised: var(--app-shadow-raised);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+:root {
+  /* Surfaces, warm rather than pure grey. Pure #fff under a lot of text reads
+     clinical; a few degrees of warmth reads like paper. */
+  --app-paper: #fbfaf8;
+  --app-surface: #ffffff;
+  --app-surface-sunken: #f4f2ef;
+  --app-line: #e6e3dd;
+  --app-line-strong: #d3cfc7;
+
+  /* Text. Not pure black: #111 against white is sharp enough to read and soft
+     enough not to buzz. */
+  --app-ink: #16161a;
+  --app-ink-soft: #55555f;
+  --app-ink-faint: #85858f;
+
+  /* The one accent. Links, focus rings, and the active state of a control. */
+  --app-accent: #0f766e;
+  --app-accent-soft: #e6f2f1;
+  --app-accent-strong: #115e59;
+
+  /* Shadows are barely there on purpose. This is a document, not a dashboard
+     from 2014. */
+  --app-shadow-card: 0 1px 2px rgb(22 22 26 / 0.04), 0 1px 3px rgb(22 22 26 / 0.06);
+  --app-shadow-raised: 0 2px 4px rgb(22 22 26 / 0.04), 0 6px 16px rgb(22 22 26 / 0.08);
 }
 
 /**
@@ -51,27 +88,27 @@
  *
  * Not an inversion. Inverting a warm light palette gives a cold blue-grey dark
  * one, so the dark surfaces keep a trace of the same warmth and the accent is
- * lifted, because a mid-tone teal that reads well on paper disappears on
+ * lifted, because a mid-tone teal that reads well on paper disappears against
  * charcoal.
  */
 @media (prefers-color-scheme: dark) {
-  @theme {
-    --color-paper: #0d0d0f;
-    --color-surface: #16161a;
-    --color-surface-sunken: #101014;
-    --color-line: #2a2a31;
-    --color-line-strong: #3a3a44;
+  :root {
+    --app-paper: #0d0d0f;
+    --app-surface: #16161a;
+    --app-surface-sunken: #101014;
+    --app-line: #2a2a31;
+    --app-line-strong: #3a3a44;
 
-    --color-ink: #f2f1ee;
-    --color-ink-soft: #a8a8b3;
-    --color-ink-faint: #74747f;
+    --app-ink: #f2f1ee;
+    --app-ink-soft: #a8a8b3;
+    --app-ink-faint: #74747f;
 
-    --color-accent: #2dd4bf;
-    --color-accent-soft: #10312e;
-    --color-accent-strong: #5eead4;
+    --app-accent: #2dd4bf;
+    --app-accent-soft: #10312e;
+    --app-accent-strong: #5eead4;
 
-    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-raised: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.45);
+    --app-shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+    --app-shadow-raised: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.45);
   }
 }
 
