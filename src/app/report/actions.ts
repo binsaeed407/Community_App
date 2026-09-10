@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/guards";
 import { checkIssueRateLimit } from "@/lib/rate-limit";
 import { issueSchema } from "@/lib/validation/issue";
+import { suggestCategorySafely } from "@/lib/classify";
 
 export type ReportState = {
   fieldErrors: Record<string, string[]>;
@@ -54,12 +55,25 @@ export async function createIssueAction(
   // dangling foreign key and a 500 at render time.
   const category = await db.category.findUnique({
     where: { id: input.categoryId },
-    select: { id: true },
+    select: { id: true, slug: true },
   });
 
   if (!category) {
     return { fieldErrors: { categoryId: ["Choose a category"] }, formError: null };
   }
+
+  // Re-run the classifier on the server rather than trusting what the browser
+  // posted. It is the same pure function the form ran, so the answer is the
+  // same — but the recorded accuracy has to be a measurement, not a claim the
+  // client got to make about itself.
+  //
+  // Safely, because a failure here must not cost someone the report they have
+  // just written out. Suggestion is a convenience; submitting is the point.
+  const suggestion = await suggestCategorySafely(input.title, input.description);
+
+  const suggestedCategory = suggestion?.slug
+    ? await db.category.findUnique({ where: { slug: suggestion.slug }, select: { id: true } })
+    : null;
 
   let issueId: string;
 
@@ -101,6 +115,22 @@ export async function createIssueAction(
             kind: "REPORT" as const,
             uploadedById: user.id,
           })),
+        });
+      }
+
+      if (suggestion) {
+        // Recorded whether or not anything was suggested. A row saying "no
+        // confident guess" is a real result and the accuracy figures are
+        // meaningless without it.
+        await tx.aIAnalysis.create({
+          data: {
+            issueId: issue.id,
+            suggestedCategoryId: suggestedCategory?.id ?? null,
+            confidence: suggestion.confidence,
+            accepted: suggestedCategory?.id === input.categoryId,
+            source: suggestion.source,
+            rawOutput: suggestion.detail,
+          },
         });
       }
 

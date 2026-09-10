@@ -1,14 +1,15 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useFormStatus } from "react-dom";
 import { MAP_DEFAULT_CENTRE, type Coordinates } from "@/lib/constants";
 import { DESCRIPTION_MAX, TITLE_MAX } from "@/lib/validation/issue";
+import { classify } from "@/lib/classify/rules";
 import { PhotoUpload } from "@/components/upload/photo-upload";
 import { createIssueAction, emptyReportState } from "./actions";
 
-export type CategoryOption = { id: string; name: string; icon: string };
+export type CategoryOption = { id: string; name: string; icon: string; slug: string };
 
 /**
  * Leaflet reads `window` when the module is imported, so importing it on the
@@ -57,6 +58,8 @@ export function ReportForm({
   categories: CategoryOption[];
   uploadsEnabled: boolean;
 }) {
+  const titleRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const [state, formAction] = useActionState(createIssueAction, emptyReportState);
   const { fieldErrors } = state;
 
@@ -67,6 +70,26 @@ export function ReportForm({
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState("");
+  const [touchedCategory, setTouchedCategory] = useState(false);
+  const [suggestion, setSuggestion] = useState<CategoryOption | null>(null);
+
+  /**
+   * Runs the classifier in the browser as the description is written.
+   *
+   * It is the same pure function the server runs, so there is no network call
+   * and no waiting — and no way for the two to disagree. The server re-runs it
+   * on submit rather than trusting whatever the browser posts.
+   */
+  function updateSuggestion(title: string, description: string) {
+    const result = classify(title, description);
+    const match = result.slug ? (categories.find((c) => c.slug === result.slug) ?? null) : null;
+    setSuggestion(match);
+
+    // Pre-fill only while the person has not chosen for themselves. Changing a
+    // selection someone has already made would be the app overruling them,
+    // which is exactly what an editable suggestion must never do.
+    if (match && !touchedCategory) setCategoryId(match.id);
+  }
 
   // The pin wears the chosen category icon, so the map reflects the rest of
   // the form rather than sitting beside it.
@@ -122,7 +145,10 @@ export function ReportForm({
           name="categoryId"
           required
           value={categoryId}
-          onChange={(event) => setCategoryId(event.target.value)}
+          onChange={(event) => {
+            setCategoryId(event.target.value);
+            setTouchedCategory(true);
+          }}
           aria-describedby={fieldErrors.categoryId ? "categoryId-error" : undefined}
           aria-invalid={Boolean(fieldErrors.categoryId)}
           className={inputClass}
@@ -136,6 +162,16 @@ export function ReportForm({
             </option>
           ))}
         </select>
+        {suggestion && categoryId === suggestion.id ? (
+          <p className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="inline-flex items-center rounded-full border border-blue-300 bg-blue-50 px-2 py-0.5 font-medium text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
+              Suggested
+            </span>
+            <span className="text-neutral-500">
+              Picked from what you wrote. Change it if it is wrong.
+            </span>
+          </p>
+        ) : null}
         <FieldError id="categoryId-error" messages={fieldErrors.categoryId} />
       </div>
 
@@ -145,11 +181,15 @@ export function ReportForm({
         </label>
         <input
           id="title"
+          ref={titleRef}
           name="title"
           type="text"
           required
           maxLength={TITLE_MAX}
           placeholder="Deep pothole outside the library"
+          onChange={(event) =>
+            updateSuggestion(event.target.value, descriptionRef.current?.value ?? "")
+          }
           aria-describedby={fieldErrors.title ? "title-error" : "title-hint"}
           aria-invalid={Boolean(fieldErrors.title)}
           className={inputClass}
@@ -170,7 +210,11 @@ export function ReportForm({
           required
           rows={5}
           maxLength={DESCRIPTION_MAX}
+          ref={descriptionRef}
           placeholder="How big is it, how long has it been there, and is anyone at risk?"
+          onChange={(event) =>
+            updateSuggestion(titleRef.current?.value ?? "", event.target.value)
+          }
           aria-describedby={fieldErrors.description ? "description-error" : "description-hint"}
           aria-invalid={Boolean(fieldErrors.description)}
           className={inputClass}
