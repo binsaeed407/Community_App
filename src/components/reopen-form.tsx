@@ -3,7 +3,8 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { REASON_MIN } from "@/lib/validation/admin";
-import { reopenIssueAction, emptyAdminState } from "@/app/admin/issues/[id]/actions";
+import { reopenIssueAction } from "@/app/admin/issues/[id]/actions";
+import { emptyFormState } from "@/lib/form-state";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -29,7 +30,7 @@ function SubmitButton() {
  * the table is append-only.
  */
 export function ReopenForm({ issueId }: { issueId: string }) {
-  const [state, formAction] = useActionState(reopenIssueAction, emptyAdminState);
+  const [state, formAction] = useActionState(reopenIssueAction, emptyFormState);
   const [open, setOpen] = useState(false);
 
   if (state.ok) {

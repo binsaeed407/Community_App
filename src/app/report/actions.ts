@@ -7,18 +7,12 @@ import { requireUser } from "@/lib/guards";
 import { checkIssueRateLimit } from "@/lib/rate-limit";
 import { issueSchema } from "@/lib/validation/issue";
 import { suggestCategorySafely } from "@/lib/classify";
-
-export type ReportState = {
-  fieldErrors: Record<string, string[]>;
-  formError: string | null;
-};
-
-export const emptyReportState: ReportState = { fieldErrors: {}, formError: null };
+import { emptyFormState, type FormState } from "@/lib/form-state";
 
 export async function createIssueAction(
-  _previous: ReportState,
+  _previous: FormState,
   formData: FormData,
-): Promise<ReportState> {
+): Promise<FormState> {
   // First line of every mutation. Middleware redirects unauthenticated page
   // navigations, but a server action is an endpoint that can be posted to
   // directly — so this is the check that actually matters.
@@ -26,10 +20,7 @@ export async function createIssueAction(
 
   const limit = await checkIssueRateLimit(user.id);
   if (!limit.allowed) {
-    return {
-      fieldErrors: {},
-      formError: `You have reported several problems in the last hour. Please try again in ${limit.retryAfterMinutes} minute${limit.retryAfterMinutes === 1 ? "" : "s"}.`,
-    };
+    return { ...emptyFormState, formError: `You have reported several problems in the last hour. Please try again in ${limit.retryAfterMinutes} minute${limit.retryAfterMinutes === 1 ? "" : "s"}.` };
   }
 
   const rawPhotos = formData.get("photos");
@@ -45,7 +36,7 @@ export async function createIssueAction(
   });
 
   if (!parsed.success) {
-    return { fieldErrors: parsed.error.flatten().fieldErrors, formError: null };
+    return { ...emptyFormState, fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
   const input = parsed.data;
@@ -59,7 +50,7 @@ export async function createIssueAction(
   });
 
   if (!category) {
-    return { fieldErrors: { categoryId: ["Choose a category"] }, formError: null };
+    return { ...emptyFormState, fieldErrors: { categoryId: ["Choose a category"] } };
   }
 
   // Re-run the classifier on the server rather than trusting what the browser
@@ -138,10 +129,7 @@ export async function createIssueAction(
     });
   } catch (error) {
     console.error("Failed to create issue", error);
-    return {
-      fieldErrors: {},
-      formError: "Something went wrong saving your report. Nothing was saved — please try again.",
-    };
+    return { ...emptyFormState, formError: "Something went wrong saving your report. Nothing was saved — please try again." };
   }
 
   // Both lists are cached, and neither knows about the new row until told.

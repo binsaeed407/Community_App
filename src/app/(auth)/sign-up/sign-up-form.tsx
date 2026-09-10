@@ -3,7 +3,8 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { MIN_PASSWORD_LENGTH } from "@/lib/validation/auth";
-import { signUpAction, emptySignUpState } from "./actions";
+import { signUpAction } from "./actions";
+import { emptyFormState } from "@/lib/form-state";
 
 const inputClass =
   "rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100";
@@ -33,7 +34,7 @@ function FieldError({ id, messages }: { id: string; messages?: string[] }) {
 }
 
 export function SignUpForm() {
-  const [state, formAction] = useActionState(signUpAction, emptySignUpState);
+  const [state, formAction] = useActionState(signUpAction, emptyFormState);
   const { fieldErrors } = state;
 
   return (

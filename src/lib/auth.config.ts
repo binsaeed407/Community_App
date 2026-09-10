@@ -14,6 +14,20 @@ import type { NextAuthConfig } from "next-auth";
  * build time with a module-not-found error for Node built-ins.
  */
 export const authConfig = {
+  /**
+   * Trust the Host header this request arrived with.
+   *
+   * Auth.js refuses unknown hosts in production by default, because a forged
+   * Host header could otherwise redirect an OAuth callback to an attacker.
+   * That protection does not apply here: there is no OAuth provider, and the
+   * only redirect target is a same-origin path.
+   *
+   * Without this, `next start` on localhost dies with UntrustedHost, so the
+   * production build cannot be run or tested anywhere but Vercel — which is
+   * exactly where you least want to be finding out that it is broken.
+   */
+  trustHost: true,
+
   pages: {
     signIn: "/sign-in",
   },

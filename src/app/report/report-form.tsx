@@ -7,7 +7,8 @@ import { MAP_DEFAULT_CENTRE, type Coordinates } from "@/lib/constants";
 import { DESCRIPTION_MAX, TITLE_MAX } from "@/lib/validation/issue";
 import { classify } from "@/lib/classify/rules";
 import { PhotoUpload } from "@/components/upload/photo-upload";
-import { createIssueAction, emptyReportState } from "./actions";
+import { createIssueAction } from "./actions";
+import { emptyFormState } from "@/lib/form-state";
 
 export type CategoryOption = { id: string; name: string; icon: string; slug: string };
 
@@ -60,7 +61,7 @@ export function ReportForm({
 }) {
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
-  const [state, formAction] = useActionState(createIssueAction, emptyReportState);
+  const [state, formAction] = useActionState(createIssueAction, emptyFormState);
   const { fieldErrors } = state;
 
   // The pin starts at the default centre rather than at 0,0 — a form that opens

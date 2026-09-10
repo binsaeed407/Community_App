@@ -5,18 +5,7 @@ import { db } from "@/lib/db";
 import { requireAdmin, requireUser } from "@/lib/guards";
 import { canTransition, requiresEvidence } from "@/lib/transitions";
 import { statusChangeSchema } from "@/lib/validation/admin";
-
-export type AdminActionState = {
-  fieldErrors: Record<string, string[]>;
-  formError: string | null;
-  ok: boolean;
-};
-
-export const emptyAdminState: AdminActionState = {
-  fieldErrors: {},
-  formError: null,
-  ok: false,
-};
+import { emptyFormState, type FormState } from "@/lib/form-state";
 
 /**
  * Change the status of an issue.
@@ -34,9 +23,9 @@ export const emptyAdminState: AdminActionState = {
  *  - Nothing is ever updated in the history table. Only inserted.
  */
 export async function changeStatusAction(
-  _previous: AdminActionState,
+  _previous: FormState,
   formData: FormData,
-): Promise<AdminActionState> {
+): Promise<FormState> {
   const admin = await requireAdmin();
 
   const parsed = statusChangeSchema.safeParse({
@@ -48,7 +37,7 @@ export async function changeStatusAction(
 
   if (!parsed.success) {
     return {
-      ...emptyAdminState,
+      ...emptyFormState,
       fieldErrors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -61,7 +50,7 @@ export async function changeStatusAction(
   });
 
   if (!issue) {
-    return { ...emptyAdminState, formError: "That issue no longer exists." };
+    return { ...emptyFormState, formError: "That issue no longer exists." };
   }
 
   // Re-read the current status from the database rather than trusting whatever
@@ -70,7 +59,7 @@ export async function changeStatusAction(
   // done since their page loaded.
   if (!canTransition(issue.status, status, "ADMIN")) {
     return {
-      ...emptyAdminState,
+      ...emptyFormState,
       formError:
         "That change is not allowed from the issue's current status. It may have been updated by someone else — reload and try again.",
     };
@@ -78,7 +67,7 @@ export async function changeStatusAction(
 
   if (requiresEvidence(status) && photos.length === 0) {
     return {
-      ...emptyAdminState,
+      ...emptyFormState,
       fieldErrors: {
         photos: ["Attach a photo showing the work was done before marking this resolved."],
       },
@@ -120,7 +109,7 @@ export async function changeStatusAction(
   } catch (error) {
     console.error("Failed to change status", error);
     return {
-      ...emptyAdminState,
+      ...emptyFormState,
       formError: "Something went wrong. Nothing was changed — please try again.",
     };
   }
@@ -130,7 +119,7 @@ export async function changeStatusAction(
   revalidatePath("/admin");
   revalidatePath("/issues");
 
-  return { ...emptyAdminState, ok: true };
+  return { ...emptyFormState, ok: true };
 }
 
 /**
@@ -143,9 +132,9 @@ export async function changeStatusAction(
  * another row too.
  */
 export async function reopenIssueAction(
-  _previous: AdminActionState,
+  _previous: FormState,
   formData: FormData,
-): Promise<AdminActionState> {
+): Promise<FormState> {
   const user = await requireUser();
 
   const parsed = statusChangeSchema.safeParse({
@@ -156,7 +145,7 @@ export async function reopenIssueAction(
   });
 
   if (!parsed.success) {
-    return { ...emptyAdminState, fieldErrors: parsed.error.flatten().fieldErrors };
+    return { ...emptyFormState, fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
   const { issueId, reason } = parsed.data;
@@ -166,21 +155,21 @@ export async function reopenIssueAction(
     select: { id: true, status: true, reporterId: true },
   });
 
-  if (!issue) return { ...emptyAdminState, formError: "That issue no longer exists." };
+  if (!issue) return { ...emptyFormState, formError: "That issue no longer exists." };
 
   // Only the person who reported it. Letting anyone reopen anything would turn
   // the timeline into a comments section, and would let one account undo every
   // resolution in the borough.
   if (issue.reporterId !== user.id) {
     return {
-      ...emptyAdminState,
+      ...emptyFormState,
       formError: "Only the person who reported this can reopen it.",
     };
   }
 
   if (!canTransition(issue.status, "REOPENED", "CITIZEN")) {
     return {
-      ...emptyAdminState,
+      ...emptyFormState,
       formError: "This report cannot be reopened from its current status.",
     };
   }
@@ -206,7 +195,7 @@ export async function reopenIssueAction(
   } catch (error) {
     console.error("Failed to reopen issue", error);
     return {
-      ...emptyAdminState,
+      ...emptyFormState,
       formError: "Something went wrong. Nothing was changed — please try again.",
     };
   }
@@ -215,7 +204,7 @@ export async function reopenIssueAction(
   revalidatePath("/admin");
   revalidatePath("/issues");
 
-  return { ...emptyAdminState, ok: true };
+  return { ...emptyFormState, ok: true };
 }
 
 function safeJson(value: FormDataEntryValue | null): unknown {

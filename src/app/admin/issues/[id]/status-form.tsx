@@ -7,7 +7,8 @@ import { STATUS_LABEL } from "@/lib/status";
 import { requiresEvidence } from "@/lib/transitions";
 import { REASON_MIN } from "@/lib/validation/admin";
 import { PhotoUpload } from "@/components/upload/photo-upload";
-import { changeStatusAction, emptyAdminState } from "./actions";
+import { changeStatusAction } from "./actions";
+import { emptyFormState } from "@/lib/form-state";
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -41,7 +42,7 @@ export function StatusForm({
   options: IssueStatus[];
   uploadsEnabled: boolean;
 }) {
-  const [state, formAction] = useActionState(changeStatusAction, emptyAdminState);
+  const [state, formAction] = useActionState(changeStatusAction, emptyFormState);
   const [selected, setSelected] = useState<IssueStatus | "">("");
 
   const needsPhoto = selected !== "" && requiresEvidence(selected);
