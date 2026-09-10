@@ -1,0 +1,24 @@
+/**
+ * Shown while the issue list is being fetched.
+ *
+ * Skeleton rows rather than a spinner: they reserve the space the real content
+ * will take, so the page does not jump when it arrives. The whole block is
+ * hidden from assistive technology — a screen reader announcing twelve empty
+ * placeholders is noise, and the page it is waiting for will announce itself.
+ */
+export default function Loading() {
+  return (
+    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10" aria-hidden="true">
+      <div className="h-9 w-64 animate-pulse rounded bg-neutral-200 dark:bg-neutral-800" />
+      <div className="mt-3 h-4 w-40 animate-pulse rounded bg-neutral-200 dark:bg-neutral-800" />
+      <ul className="mt-10 flex flex-col gap-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <li
+            key={index}
+            className="h-28 animate-pulse rounded-lg bg-neutral-100 dark:bg-neutral-900"
+          />
+        ))}
+      </ul>
+    </main>
+  );
+}
