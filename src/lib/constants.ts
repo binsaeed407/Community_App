@@ -15,6 +15,15 @@
  */
 export const OVERDUE_AFTER_DAYS = 7;
 
+/**
+ * How tall the map is.
+ *
+ * Shared by the map and by the skeleton shown while it loads. When these two
+ * were separate literals in separate files, changing one made the page jump as
+ * the map replaced the placeholder.
+ */
+export const MAP_HEIGHT = "min(70vh, 600px)";
+
 /** How many issues appear per page on the public list. */
 export const ISSUES_PER_PAGE = 12;
 

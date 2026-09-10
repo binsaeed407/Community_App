@@ -89,6 +89,9 @@ export function PageHeader({
         <h1 className="mt-1.5 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
           {title}
         </h1>
+        {/* The description stays clamped even on a full-width page. A subtitle
+            set across 1600px is unreadable — line length is a legibility limit,
+            not a leftover from the old narrow layout. */}
         {description ? (
           <p className="mt-2 max-w-2xl text-sm text-ink-soft">{description}</p>
         ) : null}

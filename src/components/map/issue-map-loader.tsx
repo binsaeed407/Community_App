@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { MapIssue } from "./issue-map";
+import { MAP_HEIGHT } from "@/lib/constants";
 
 /**
  * A client component whose only job is to lazily load the map.
@@ -18,7 +19,10 @@ import type { MapIssue } from "./issue-map";
 const IssueMap = dynamic(() => import("./issue-map").then((m) => m.IssueMap), {
   ssr: false,
   loading: () => (
-    <div className="h-[min(70vh,600px)] w-full animate-pulse rounded-card border border-line bg-surface-sunken" />
+    <div
+      style={{ height: MAP_HEIGHT }}
+      className="w-full animate-pulse rounded-card border border-line bg-surface-sunken"
+    />
   ),
 });
 

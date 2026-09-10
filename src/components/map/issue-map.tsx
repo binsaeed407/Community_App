@@ -3,7 +3,8 @@
 import "leaflet/dist/leaflet.css";
 import Link from "next/link";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { MAP_DEFAULT_CENTRE, MAP_DEFAULT_ZOOM } from "@/lib/constants";
+import { MAP_DEFAULT_CENTRE, MAP_DEFAULT_ZOOM, MAP_HEIGHT } from "@/lib/constants";
+import { MapAutoResize } from "./map-autosize";
 import { STATUS_DOT_VAR, STATUS_LABEL } from "@/lib/status";
 import { createMarkerIcon } from "./map-marker";
 import type { IssueStatus } from "@/generated/prisma/enums";
@@ -33,13 +34,14 @@ export function IssueMap({ issues }: { issues: MapIssue[] }) {
         center={[MAP_DEFAULT_CENTRE.latitude, MAP_DEFAULT_CENTRE.longitude]}
         zoom={MAP_DEFAULT_ZOOM - 2}
         scrollWheelZoom
-        style={{ height: "min(70vh, 600px)", width: "100%" }}
+        style={{ height: MAP_HEIGHT, width: "100%" }}
         // The list underneath carries the same information in a form a keyboard
         // and a screen reader can actually use, so the map itself is hidden
         // from assistive technology rather than being an obstacle in the tab
         // order that leads nowhere.
         aria-hidden="true"
       >
+        <MapAutoResize />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -248,6 +248,23 @@ body {
   color: var(--color-brand);
 }
 
+/**
+ * Keep Leaflet's controls below the app's own chrome.
+ *
+ * leaflet.css ships `.leaflet-top, .leaflet-bottom { z-index: 1000 }`, and the
+ * sticky header is z-40. Nothing between the map and <html> creates a stacking
+ * context, so the zoom buttons and the attribution compete in the root context
+ * and paint straight over the header when the page is scrolled.
+ *
+ * Lowering them is the right way round: the header and the sidebar are app
+ * chrome and should always win, and the map has no controls that need to escape
+ * their own container.
+ */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 30;
+}
+
 /* Long descriptions and reasons read better with a little more air than the
    Tailwind default. */
 .prose-body {

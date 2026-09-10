@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { useEffect } from "react";
 import { MAP_DEFAULT_ZOOM, type Coordinates } from "@/lib/constants";
+import { MapAutoResize } from "./map-autosize";
 import { createMarkerIcon } from "./map-marker";
 
 /**
@@ -68,6 +69,7 @@ export function LocationPicker({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
+        <MapAutoResize />
         <ClickToPlace onPick={onPick} />
         <FollowPin position={position} />
         <Marker
