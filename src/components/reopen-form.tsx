@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { REASON_MIN } from "@/lib/validation/admin";
-import { reopenIssueAction } from "@/app/admin/issues/[id]/actions";
+import { reopenIssueAction } from "@/app/(app)/admin/issues/[id]/actions";
 import { emptyFormState } from "@/lib/form-state";
 
 function SubmitButton() {

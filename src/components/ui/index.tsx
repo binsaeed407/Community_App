@@ -17,6 +17,39 @@ export function cx(...parts: Array<string | false | null | undefined>): string {
 
 /* ---------------------------------------------------------------- layout -- */
 
+/**
+ * The page body for an app screen.
+ *
+ * Fills the width it is given rather than pinning everything to a narrow
+ * centred column. The old Container capped every page at 1024px, which on a
+ * 1920px monitor left roughly 450px of dead margin on each side and made the
+ * whole app look like it was floating in the middle of the screen.
+ *
+ * "wide" is the default and takes the full available width up to a generous
+ * ceiling; "prose" stays narrow because a wall of text 1600px across is
+ * genuinely harder to read — line length is a legibility constraint, not a
+ * stylistic one.
+ */
+export function Shell({
+  children,
+  size = "wide",
+  className,
+}: {
+  children: ReactNode;
+  size?: "wide" | "prose" | "narrow";
+  className?: string;
+}) {
+  const width =
+    size === "narrow" ? "max-w-2xl" : size === "prose" ? "max-w-3xl" : "max-w-7xl";
+
+  return (
+    <main className={cx("w-full flex-1 px-5 py-8 sm:px-8", className)}>
+      <div className={cx("mx-auto w-full", width)}>{children}</div>
+    </main>
+  );
+}
+
+/** A centred column, for the marketing pages that still want one. */
 export function Container({
   children,
   size = "wide",
@@ -27,10 +60,10 @@ export function Container({
   className?: string;
 }) {
   const width =
-    size === "narrow" ? "max-w-2xl" : size === "prose" ? "max-w-3xl" : "max-w-5xl";
+    size === "narrow" ? "max-w-2xl" : size === "prose" ? "max-w-3xl" : "max-w-7xl";
 
   return (
-    <div className={cx("mx-auto w-full px-5 sm:px-6", width, className)}>{children}</div>
+    <div className={cx("mx-auto w-full px-5 sm:px-8", width, className)}>{children}</div>
   );
 }
 
@@ -98,7 +131,7 @@ const buttonSizes = {
 };
 
 const buttonVariants = {
-  primary: "bg-ink text-paper hover:bg-ink-soft",
+  primary: "bg-brand text-on-brand hover:bg-brand-hover",
   secondary: "border border-line-strong bg-surface text-ink hover:bg-surface-sunken",
   ghost: "text-ink-soft hover:bg-surface-sunken hover:text-ink",
   danger:
@@ -142,7 +175,7 @@ export function ButtonLink({
 /* ------------------------------------------------------------------ forms -- */
 
 export const fieldClass =
-  "w-full rounded-control border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint transition-colors focus-visible:border-accent";
+  "w-full rounded-control border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint transition-colors focus-visible:border-brand";
 
 export function Field({
   label,

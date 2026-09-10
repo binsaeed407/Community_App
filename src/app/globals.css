@@ -1,41 +1,47 @@
 @import "tailwindcss";
 
 /**
- * Design tokens.
- *
- * Every colour, radius and shadow in the app comes from here. The point is not
- * tidiness — it is that "make the borders softer" is one edit rather than a
- * search across forty files, and that light and dark stay in step because they
- * are defined side by side.
- *
- * The palette is deliberately restrained: warm paper, near-black ink, and a
- * single teal accent. All the actual hue in the interface is carried by the
- * status colours, because in this app colour means something — a badge is the
- * difference between "we are working on it" and "we closed it". A decorative
- * brand colour competing with those would make the meaningful ones quieter.
+ * Design tokens and theming.
  *
  * ---------------------------------------------------------------------------
- * Why the values are indirected through a second set of variables:
+ * How light and dark are switched
  *
- * `@theme` is not a normal CSS rule. Tailwind reads it at build time to decide
- * which utilities to generate, and it collapses to a single set of values — so
- * an `@theme` block nested inside `@media (prefers-color-scheme: dark)` does
- * NOT produce a media-scoped override. It just overwrites the light values, and
- * the whole app ships in dark colours regardless of the visitor's setting.
+ * Three states have to work: light, dark, and follow-the-system. Almost every
+ * implementation of that writes the dark palette out twice — once inside a
+ * `prefers-color-scheme` media query and once under a `[data-theme="dark"]`
+ * selector — and the two copies drift.
  *
- * That is not a hypothetical: it is what this file did, and it reached
- * production before the built stylesheet was checked and found to contain
- * exactly one definition of `--color-paper`, the dark one.
+ * This uses `light-dark()` instead. Each token declares BOTH values once, and
+ * the CSS `color-scheme` property decides which one applies:
  *
- * So `@theme` points at plain custom properties, and those are what the media
- * query swaps. Tailwind emits `color: var(--color-ink)`, `--color-ink` resolves
- * to `var(--app-ink)`, and that resolves per media query at runtime — which is
- * where the decision actually belongs.
+ *     :root                      { color-scheme: light dark; }  ← follow the OS
+ *     :root[data-theme="light"]  { color-scheme: light; }       ← forced light
+ *     :root[data-theme="dark"]   { color-scheme: dark; }        ← forced dark
+ *
+ * So the whole theme switch is three lines, there is exactly one definition of
+ * every colour, and the two palettes cannot fall out of step. It also sets the
+ * native `color-scheme`, which means form controls, scrollbars and the browser's
+ * own UI match the theme for free.
+ *
+ * ---------------------------------------------------------------------------
+ * Why @theme points at other variables
+ *
+ * `@theme` is not a normal CSS rule. Tailwind reads it at BUILD time and
+ * collapses it to a single set of values, so an `@theme` nested inside a media
+ * query does not scope — it silently overwrites. That shipped to production
+ * once: the built stylesheet contained one definition of `--color-paper`, the
+ * dark one, and every visitor got dark colours regardless of their setting.
+ *
+ * So `@theme` points at plain custom properties, and those carry the
+ * `light-dark()` calls. Tailwind emits `background: var(--color-paper)`, that
+ * resolves to `var(--app-paper)`, and that resolves in the browser — which is
+ * where a decision about the visitor's preferences belongs.
  */
 @theme {
   --color-paper: var(--app-paper);
   --color-surface: var(--app-surface);
   --color-surface-sunken: var(--app-surface-sunken);
+  --color-surface-raised: var(--app-surface-raised);
   --color-line: var(--app-line);
   --color-line-strong: var(--app-line-strong);
 
@@ -43,9 +49,16 @@
   --color-ink-soft: var(--app-ink-soft);
   --color-ink-faint: var(--app-ink-faint);
 
+  /* The primary brand colour — used for navigation, primary actions and links. */
+  --color-brand: var(--app-brand);
+  --color-brand-hover: var(--app-brand-hover);
+  --color-brand-soft: var(--app-brand-soft);
+  --color-brand-line: var(--app-brand-line);
+  --color-on-brand: var(--app-on-brand);
+
+  /* A warm secondary, used for highlights that are not actions. */
   --color-accent: var(--app-accent);
   --color-accent-soft: var(--app-accent-soft);
-  --color-accent-strong: var(--app-accent-strong);
 
   --radius-card: 0.75rem;
   --radius-control: 0.5rem;
@@ -57,59 +70,62 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+/* -------------------------------------------------------------- switching -- */
+
 :root {
-  /* Surfaces, warm rather than pure grey. Pure #fff under a lot of text reads
-     clinical; a few degrees of warmth reads like paper. */
-  --app-paper: #fbfaf8;
-  --app-surface: #ffffff;
-  --app-surface-sunken: #f4f2ef;
-  --app-line: #e6e3dd;
-  --app-line-strong: #d3cfc7;
-
-  /* Text. Not pure black: #111 against white is sharp enough to read and soft
-     enough not to buzz. */
-  --app-ink: #16161a;
-  --app-ink-soft: #55555f;
-  --app-ink-faint: #85858f;
-
-  /* The one accent. Links, focus rings, and the active state of a control. */
-  --app-accent: #0f766e;
-  --app-accent-soft: #e6f2f1;
-  --app-accent-strong: #115e59;
-
-  /* Shadows are barely there on purpose. This is a document, not a dashboard
-     from 2014. */
-  --app-shadow-card: 0 1px 2px rgb(22 22 26 / 0.04), 0 1px 3px rgb(22 22 26 / 0.06);
-  --app-shadow-raised: 0 2px 4px rgb(22 22 26 / 0.04), 0 6px 16px rgb(22 22 26 / 0.08);
+  color-scheme: light dark;
 }
 
-/**
- * Dark mode.
- *
- * Not an inversion. Inverting a warm light palette gives a cold blue-grey dark
- * one, so the dark surfaces keep a trace of the same warmth and the accent is
- * lifted, because a mid-tone teal that reads well on paper disappears against
- * charcoal.
- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --app-paper: #0d0d0f;
-    --app-surface: #16161a;
-    --app-surface-sunken: #101014;
-    --app-line: #2a2a31;
-    --app-line-strong: #3a3a44;
+:root[data-theme="light"] {
+  color-scheme: light;
+}
 
-    --app-ink: #f2f1ee;
-    --app-ink-soft: #a8a8b3;
-    --app-ink-faint: #74747f;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
 
-    --app-accent: #2dd4bf;
-    --app-accent-soft: #10312e;
-    --app-accent-strong: #5eead4;
+/* ----------------------------------------------------------------- values -- */
 
-    --app-shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
-    --app-shadow-raised: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.45);
-  }
+:root {
+  /* Surfaces. Warm rather than pure grey in light; in dark, a blue-leaning
+     charcoal rather than black, because pure #000 next to coloured UI reads as
+     a hole in the screen. */
+  --app-paper: light-dark(#f7f8fa, #0b0f19);
+  --app-surface: light-dark(#ffffff, #131a29);
+  --app-surface-sunken: light-dark(#eef1f6, #0e1421);
+  --app-surface-raised: light-dark(#ffffff, #1a2334);
+  --app-line: light-dark(#e2e7f0, #223049);
+  --app-line-strong: light-dark(#cbd3e1, #2f4160);
+
+  /* Text. Not pure black on white and not pure white on dark — both buzz. */
+  --app-ink: light-dark(#111827, #eef2f9);
+  --app-ink-soft: light-dark(#4b5563, #9fb0cb);
+  --app-ink-faint: light-dark(#6b7a91, #6d7f9c);
+
+  /* Brand: a deep confident indigo-blue. Institutional without being cold, and
+     far enough from every status hue that a primary button is never mistaken
+     for a status. */
+  --app-brand: light-dark(#3448d8, #7b8cff);
+  --app-brand-hover: light-dark(#2536b0, #96a4ff);
+  --app-brand-soft: light-dark(#eaedff, #1c2547);
+  --app-brand-line: light-dark(#c3cbff, #35427a);
+  --app-on-brand: light-dark(#ffffff, #0b0f19);
+
+  /* Accent: a warm amber, for highlights that are emphatically not buttons —
+     the overdue rule, a "suggested" badge, a stat worth noticing. */
+  --app-accent: light-dark(#b45309, #fbbf24);
+  --app-accent-soft: light-dark(#fef3c7, #3a2a07);
+
+  /* Shadows are quiet in light and nearly absent in dark, where elevation is
+     carried by surface lightness instead. */
+  --app-shadow-card: light-dark(
+    0 1px 2px rgb(17 24 39 / 0.04),
+    0 1px 2px rgb(0 0 0 / 0.5)
+  );
+  --app-shadow-raised: light-dark(
+    0 2px 4px rgb(17 24 39 / 0.04),
+    0 8px 24px rgb(0 0 0 / 0.5)
+  );
 }
 
 body {
@@ -131,21 +147,21 @@ body {
  * perfectly fine to the person who built it.
  */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-brand);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
 ::selection {
-  background: var(--color-accent-soft);
-  color: var(--color-accent-strong);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
 }
 
 /* Long descriptions and reasons read better with a little more air than the
    Tailwind default. */
 .prose-body {
   line-height: 1.65;
-  max-width: 68ch;
+  max-width: 70ch;
 }
 
 @media (prefers-reduced-motion: reduce) {

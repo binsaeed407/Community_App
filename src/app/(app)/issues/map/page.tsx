@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listIssuesForMap } from "@/lib/issues";
 import { IssueMapLoader } from "@/components/map/issue-map-loader";
 import { STATUS_LABEL } from "@/lib/status";
-import { ButtonLink, Container, PageHeader } from "@/components/ui";
+import { ButtonLink, Shell, PageHeader } from "@/components/ui";
 
 export const metadata = {
   title: "Issue map",
@@ -22,7 +22,7 @@ export default async function IssueMapPage() {
   const issues = await listIssuesForMap();
 
   return (
-    <Container className="flex-1 py-10">
+    <Shell>
       <PageHeader
         eyebrow="Public record"
         title="Issue map"
@@ -64,6 +64,6 @@ export default async function IssueMapPage() {
           ))}
         </ul>
       </section>
-    </Container>
+    </Shell>
   );
 }

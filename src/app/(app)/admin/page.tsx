@@ -4,7 +4,7 @@ import { getDashboard } from "@/lib/admin";
 import { daysSince } from "@/lib/format";
 import { STATUS_LABEL } from "@/lib/status";
 import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
-import { Container, PageHeader, Stat, cx } from "@/components/ui";
+import { Shell, PageHeader, Stat, cx } from "@/components/ui";
 import type { IssueStatus } from "@/generated/prisma/enums";
 
 export const metadata = {
@@ -119,7 +119,7 @@ export default async function AdminDashboard() {
   const total = Object.values(countByStatus).reduce((sum, n) => sum + n, 0);
 
   return (
-    <Container className="flex-1 py-10">
+    <Shell>
       <PageHeader
         eyebrow="Administrator"
         title="Triage"
@@ -163,6 +163,6 @@ export default async function AdminDashboard() {
           issues={recentlyResolved}
         />
       </div>
-    </Container>
+    </Shell>
   );
 }

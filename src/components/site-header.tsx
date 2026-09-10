@@ -1,96 +1,99 @@
 import Link from "next/link";
 import { getSessionUser } from "@/lib/guards";
 import { signOut } from "@/lib/auth";
-import { ButtonLink, Button, Container, cx } from "@/components/ui";
+import { ButtonLink, cx } from "@/components/ui";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ProfileMenu } from "@/components/profile-menu";
+import { MobileNav } from "@/components/mobile-nav";
 
 /**
- * The header is a server component, so it reads the session while rendering
- * rather than fetching it from the browser after the page has already painted.
- * That is what avoids the half-second where a signed-in user is shown a
- * "Sign in" button.
+ * The top bar, on every page.
+ *
+ * A server component, so it reads the session while rendering rather than
+ * fetching it from the browser after the page has painted. That is what avoids
+ * the half-second where a signed-in user is shown a "Sign in" button.
+ *
+ * It spans the full width rather than sitting inside a centred container,
+ * because a header that stops short of the screen edges makes the whole app
+ * look like it is floating in the middle of a large monitor.
  */
-
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="rounded-control px-2.5 py-1.5 text-sm text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
-    >
-      {children}
-    </Link>
-  );
-}
-
 export async function SiteHeader() {
   const user = await getSessionUser();
 
+  // Defined here rather than inside ProfileMenu because `signOut` only runs on
+  // the server. The menu is a client component, so it receives the rendered
+  // form as a child instead of trying to import a server action it cannot hold.
+  const signOutForm = (
+    <form
+      action={async () => {
+        "use server";
+        await signOut({ redirectTo: "/" });
+      }}
+    >
+      <button
+        type="submit"
+        className="w-full rounded-control px-2.5 py-2 text-left text-sm text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+      >
+        Sign out
+      </button>
+    </form>
+  );
+
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-sm">
-      <Container>
-        <nav aria-label="Main" className="flex h-14 items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            {/* A mark rather than a logo file: two overlapping pins, drawn in
-                CSS. Nothing to load, scales cleanly, and it is one less asset
-                to explain the provenance of. */}
-            <span
-              aria-hidden="true"
-              className="grid h-6 w-6 place-items-center rounded-md bg-ink text-[11px] font-bold text-paper"
-            >
-              C
-            </span>
-            <span className="hidden sm:inline">Community App</span>
-          </Link>
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+      <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
+        {user ? <MobileNav role={user.role} /> : null}
 
-          <div className="flex items-center gap-1">
-            <NavLink href="/issues">Issues</NavLink>
-            <NavLink href="/issues/map">Map</NavLink>
+        <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
+          <span
+            aria-hidden="true"
+            className="grid h-7 w-7 place-items-center rounded-lg bg-brand text-xs font-bold text-on-brand"
+          >
+            C
+          </span>
+          <span className="hidden sm:inline">Community App</span>
+        </Link>
 
-            {user ? (
-              <>
-                {user.role === "ADMIN" ? (
-                  <NavLink href="/admin">Dashboard</NavLink>
-                ) : (
-                  <NavLink href="/my-reports">My reports</NavLink>
-                )}
-
-                <span className="mx-1 hidden h-5 w-px bg-line md:block" aria-hidden="true" />
-
-                {/* The display name, never the email — the same rule the public
-                    pages follow, applied to the header too. */}
-                <span
-                  className={cx(
-                    "hidden max-w-[12ch] truncate text-sm text-ink-faint md:inline",
-                    user.role === "ADMIN" && "font-medium text-accent",
-                  )}
-                  title={user.role === "ADMIN" ? "Signed in as an administrator" : undefined}
+        <div className="ml-auto flex items-center gap-2">
+          {/* Kept in the header for signed-out visitors, who have no sidebar. */}
+          {!user ? (
+            <nav aria-label="Main" className="mr-1 hidden items-center gap-1 sm:flex">
+              {[
+                { href: "/issues", label: "Issues" },
+                { href: "/issues/map", label: "Map" },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-control px-2.5 py-1.5 text-sm text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
                 >
-                  {user.displayName}
-                </span>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          ) : null}
 
-                {/*
-                  Sign-out is a form, not a link, because it changes state. A GET
-                  request that ends your session can be triggered by anything that
-                  embeds the URL — including an image tag on someone else's page.
-                */}
-                <form
-                  action={async () => {
-                    "use server";
-                    await signOut({ redirectTo: "/" });
-                  }}
-                >
-                  <Button type="submit" variant="ghost" size="sm">
-                    Sign out
-                  </Button>
-                </form>
-              </>
-            ) : (
-              <ButtonLink href="/sign-in" size="sm" className="ml-1">
-                Sign in
-              </ButtonLink>
-            )}
-          </div>
-        </nav>
-      </Container>
+          <ThemeToggle />
+
+          {user ? (
+            <ProfileMenu
+              displayName={user.displayName}
+              email={user.email}
+              role={user.role}
+              signOutForm={signOutForm}
+            />
+          ) : (
+            <ButtonLink href="/sign-in" size="sm">
+              Sign in
+            </ButtonLink>
+          )}
+        </div>
+      </div>
     </header>
   );
+}
+
+/** Shown under the header on the app pages, as the desktop sidebar's twin. */
+export function HeaderSpacer({ className }: { className?: string }) {
+  return <div className={cx("h-14", className)} aria-hidden="true" />;
 }

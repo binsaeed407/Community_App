@@ -2,7 +2,7 @@ import { listCategories } from "@/lib/issues";
 import { requireUser } from "@/lib/guards";
 import { isCloudinaryConfigured } from "@/lib/cloudinary";
 import { ReportForm } from "./report-form";
-import { Container, PageHeader } from "@/components/ui";
+import { Shell, PageHeader } from "@/components/ui";
 
 export const metadata = {
   title: "Report a problem",
@@ -20,7 +20,7 @@ export default async function ReportPage() {
   const categories = await listCategories();
 
   return (
-    <Container size="narrow" className="flex-1 py-10">
+    <Shell size="narrow">
       <PageHeader
         eyebrow="New report"
         title="Report a problem"
@@ -28,6 +28,6 @@ export default async function ReportPage() {
       />
 
       <ReportForm categories={categories} uploadsEnabled={isCloudinaryConfigured()} />
-    </Container>
+    </Shell>
   );
 }

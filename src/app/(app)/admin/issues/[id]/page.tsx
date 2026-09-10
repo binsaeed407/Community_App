@@ -9,7 +9,7 @@ import { isOverdue } from "@/lib/status";
 import { OverdueBadge, StatusBadge } from "@/components/status-badge";
 import { IssueTimeline } from "@/components/issue-timeline";
 import { StatusForm } from "./status-form";
-import { Card, Container } from "@/components/ui";
+import { Card, Shell } from "@/components/ui";
 
 export const metadata = {
   title: "Manage issue",
@@ -37,7 +37,7 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
   const reported = issue.attachments.filter((a) => a.kind === "REPORT");
 
   return (
-    <Container size="prose" className="flex-1 py-10">
+    <Shell size="prose">
       <div className="flex items-center justify-between gap-4">
         <Link href="/admin" className="text-sm underline">
           ← Dashboard
@@ -143,6 +143,6 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
           </ul>
         )}
       </section>
-    </Container>
+    </Shell>
   );
 }

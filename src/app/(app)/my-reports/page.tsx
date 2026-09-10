@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/guards";
 import { listIssues } from "@/lib/issues";
 import { isOpen } from "@/lib/status";
 import { IssueCard } from "@/components/issue-card";
-import { ButtonLink, Container, EmptyState, PageHeader } from "@/components/ui";
+import { ButtonLink, Shell, EmptyState, PageHeader } from "@/components/ui";
 
 export const metadata = {
   title: "My reports",
@@ -33,7 +33,7 @@ export default async function MyReportsPage({
   const stillOpen = issues.filter((issue) => isOpen(issue.status)).length;
 
   return (
-    <Container className="flex-1 py-10">
+    <Shell>
       <PageHeader
         eyebrow="Your account"
         title="My reports"
@@ -87,6 +87,6 @@ export default async function MyReportsPage({
           )}
         </nav>
       ) : null}
-    </Container>
+    </Shell>
   );
 }

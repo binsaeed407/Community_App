@@ -9,7 +9,7 @@ import { ReopenForm } from "@/components/reopen-form";
 import { getSessionUser } from "@/lib/guards";
 import { canTransition } from "@/lib/transitions";
 import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
-import { Card, Container, cx } from "@/components/ui";
+import { Card, Shell, cx } from "@/components/ui";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const issue = await getIssue((await params).id);
@@ -75,7 +75,7 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
   const evidencePhotos = issue.attachments.filter((a) => a.kind === "EVIDENCE");
 
   return (
-    <Container size="prose" className="flex-1 py-10">
+    <Shell size="prose">
       <Link href="/issues" className="text-sm text-ink-soft transition-colors hover:text-ink">
         ← All issues
       </Link>
@@ -172,6 +172,6 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
           </Link>
         </p>
       </section>
-    </Container>
+    </Shell>
   );
 }

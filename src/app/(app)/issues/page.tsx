@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listCategories, listIssues } from "@/lib/issues";
 import { ISSUE_STATUSES, STATUS_LABEL } from "@/lib/status";
 import { IssueCard } from "@/components/issue-card";
-import { ButtonLink, Container, EmptyState, PageHeader, cx } from "@/components/ui";
+import { ButtonLink, Shell, EmptyState, PageHeader, cx } from "@/components/ui";
 import type { IssueStatus } from "@/generated/prisma/enums";
 
 export const metadata = {
@@ -67,7 +67,7 @@ export default async function IssuesPage({
     );
 
   return (
-    <Container className="flex-1 py-10">
+    <Shell>
       <PageHeader
         eyebrow="Public record"
         title="Reported issues"
@@ -186,6 +186,6 @@ export default async function IssuesPage({
           )}
         </nav>
       ) : null}
-    </Container>
+    </Shell>
   );
 }

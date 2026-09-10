@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { db } from "@/lib/db";
-import { Container } from "@/components/ui";
+import { Shell } from "@/components/ui";
 
 export const metadata = {
   title: "Health check",
@@ -77,7 +77,7 @@ export default async function HealthPage() {
   const result = await checkDatabase();
 
   return (
-    <Container size="narrow" className="flex flex-1 flex-col justify-center gap-6 py-16">
+    <Shell size="narrow" className="flex flex-col justify-center gap-6">
       <div>
         <p className="text-sm font-medium uppercase tracking-widest text-ink-faint">
           Diagnostics
@@ -147,6 +147,6 @@ export default async function HealthPage() {
           </p>
         </div>
       )}
-    </Container>
+    </Shell>
   );
 }
