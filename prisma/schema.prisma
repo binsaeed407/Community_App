@@ -135,6 +135,9 @@ model Issue {
   /// At most one suggestion per issue, recorded at submission time.
   suggestion AIAnalysis?
 
+  /// Serves the "my reports" page, which filters by reporter and orders by date.
+  @@index([reporterId, createdAt])
+
   /// Serves the admin dashboard's status buckets and the public "newest first" list.
   @@index([status, createdAt])
   /// Serves the category filter on the public list.
