@@ -167,6 +167,18 @@ model Issue {
 model IssueStatusHistory {
   id String @id @default(cuid())
 
+  /// Insertion order, and the field the timeline is actually sorted by.
+  ///
+  /// Sorting an append-only log by createdAt looks obvious and is wrong: two
+  /// rows can share a timestamp, and then the order of history depends on how
+  /// the database happens to return ties. The seed data hit exactly that — an
+  /// issue reported and resolved the same day came back with its first row
+  /// last, which silently disagreed with the status cache on Issue.
+  ///
+  /// A database-assigned sequence cannot tie, does not depend on the clock,
+  /// and survives two rows being written in the same millisecond.
+  sequence Int @unique @default(autoincrement())
+
   issueId String
   issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
@@ -183,7 +195,7 @@ model IssueStatusHistory {
 
   /// Serves the timeline on the issue detail page, and the "what is the current
   /// status" lookup used to verify the cache on Issue.
-  @@index([issueId, createdAt])
+  @@index([issueId, sequence])
 }
 
 // ---------------------------------------------------------------------------
