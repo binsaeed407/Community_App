@@ -1,84 +1,96 @@
 import Link from "next/link";
 import { getSessionUser } from "@/lib/guards";
 import { signOut } from "@/lib/auth";
+import { ButtonLink, Button, Container, cx } from "@/components/ui";
 
 /**
- * The header is a server component, so it reads the session directly rather
- * than fetching it from the client after the page has already painted. That
- * avoids the flash of a signed-out header on a signed-in page.
+ * The header is a server component, so it reads the session while rendering
+ * rather than fetching it from the browser after the page has already painted.
+ * That is what avoids the half-second where a signed-in user is shown a
+ * "Sign in" button.
  */
+
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="rounded-control px-2.5 py-1.5 text-sm text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
+    >
+      {children}
+    </Link>
+  );
+}
+
 export async function SiteHeader() {
   const user = await getSessionUser();
 
   return (
-    <header className="border-b border-neutral-200 dark:border-neutral-800">
-      <nav
-        aria-label="Main"
-        className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4"
-      >
-        <Link href="/" className="font-semibold tracking-tight">
-          Community App
-        </Link>
-
-        <div className="flex items-center gap-4 text-sm">
-          <Link
-            href="/issues"
-            className="text-neutral-600 transition hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-          >
-            Issues
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-sm">
+      <Container>
+        <nav aria-label="Main" className="flex h-14 items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+            {/* A mark rather than a logo file: two overlapping pins, drawn in
+                CSS. Nothing to load, scales cleanly, and it is one less asset
+                to explain the provenance of. */}
+            <span
+              aria-hidden="true"
+              className="grid h-6 w-6 place-items-center rounded-md bg-ink text-[11px] font-bold text-paper"
+            >
+              C
+            </span>
+            <span className="hidden sm:inline">Community App</span>
           </Link>
 
-          {user ? (
-            <>
-              {user.role === "ADMIN" ? (
-                <Link
-                  href="/admin"
-                  className="text-neutral-600 transition hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-                >
-                  Dashboard
-                </Link>
-              ) : (
-                <Link
-                  href="/my-reports"
-                  className="text-neutral-600 transition hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-                >
-                  My reports
-                </Link>
-              )}
+          <div className="flex items-center gap-1">
+            <NavLink href="/issues">Issues</NavLink>
+            <NavLink href="/issues/map">Map</NavLink>
 
-              {/* The display name, never the email — the same rule the public
-                  pages follow, applied to the header too. */}
-              <span className="hidden text-neutral-500 sm:inline">{user.displayName}</span>
+            {user ? (
+              <>
+                {user.role === "ADMIN" ? (
+                  <NavLink href="/admin">Dashboard</NavLink>
+                ) : (
+                  <NavLink href="/my-reports">My reports</NavLink>
+                )}
 
-              {/*
-                Sign-out is a form rather than a link because it changes state.
-                A GET request that logs you out can be triggered by any page that
-                embeds the URL, which is how you end up signed out by an image tag.
-              */}
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/" });
-                }}
-              >
-                <button
-                  type="submit"
-                  className="rounded-md border border-neutral-300 px-3 py-1.5 font-medium transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                <span className="mx-1 hidden h-5 w-px bg-line md:block" aria-hidden="true" />
+
+                {/* The display name, never the email — the same rule the public
+                    pages follow, applied to the header too. */}
+                <span
+                  className={cx(
+                    "hidden max-w-[12ch] truncate text-sm text-ink-faint md:inline",
+                    user.role === "ADMIN" && "font-medium text-accent",
+                  )}
+                  title={user.role === "ADMIN" ? "Signed in as an administrator" : undefined}
                 >
-                  Sign out
-                </button>
-              </form>
-            </>
-          ) : (
-            <Link
-              href="/sign-in"
-              className="rounded-md bg-neutral-900 px-3 py-1.5 font-medium text-white transition hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
-            >
-              Sign in
-            </Link>
-          )}
-        </div>
-      </nav>
+                  {user.displayName}
+                </span>
+
+                {/*
+                  Sign-out is a form, not a link, because it changes state. A GET
+                  request that ends your session can be triggered by anything that
+                  embeds the URL — including an image tag on someone else's page.
+                */}
+                <form
+                  action={async () => {
+                    "use server";
+                    await signOut({ redirectTo: "/" });
+                  }}
+                >
+                  <Button type="submit" variant="ghost" size="sm">
+                    Sign out
+                  </Button>
+                </form>
+              </>
+            ) : (
+              <ButtonLink href="/sign-in" size="sm" className="ml-1">
+                Sign in
+              </ButtonLink>
+            )}
+          </div>
+        </nav>
+      </Container>
     </header>
   );
 }
