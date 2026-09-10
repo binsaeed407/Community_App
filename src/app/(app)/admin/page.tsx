@@ -2,10 +2,10 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/guards";
 import { getDashboard } from "@/lib/admin";
 import { daysSince } from "@/lib/format";
-import { STATUS_LABEL } from "@/lib/status";
+import { STATUS_CLASS, STATUS_DOT, STATUS_LABEL } from "@/lib/status";
+import type { IssueStatus } from "@/generated/prisma/enums";
 import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
 import { Shell, PageHeader, Stat, cx } from "@/components/ui";
-import type { IssueStatus } from "@/generated/prisma/enums";
 
 export const metadata = {
   title: "Dashboard",
@@ -26,11 +26,18 @@ function Bucket({
   description,
   issues,
   urgent,
+  tone,
 }: {
   title: string;
   description: string;
   issues: Row[];
   urgent?: boolean;
+  /**
+   * The status this bucket is about. Its header takes that status’s own tint,
+   * so the dashboard teaches the same six colours the badges use rather than
+   * being four identical grey panels with one red one.
+   */
+  tone?: IssueStatus;
 }) {
   return (
     <section
@@ -44,7 +51,9 @@ function Bucket({
           "flex items-baseline justify-between gap-3 rounded-t-card border-b px-5 py-3.5",
           urgent
             ? "border-red-200 bg-red-50 dark:border-red-900/60 dark:bg-red-950/40"
-            : "border-line bg-surface-sunken",
+            : tone
+              ? STATUS_CLASS[tone]
+              : "border-line bg-surface-sunken",
         )}
       >
         <div>
@@ -53,8 +62,8 @@ function Bucket({
         </div>
         <span
           className={cx(
-            "shrink-0 rounded-full px-2 py-0.5 text-sm font-semibold tabular-nums",
-            urgent ? "bg-red-600 text-white" : "bg-ink/8 text-ink-soft",
+            "shrink-0 rounded-full px-2.5 py-0.5 text-sm font-semibold tabular-nums text-white",
+            urgent ? "bg-red-600" : tone ? STATUS_DOT[tone] : "bg-ink-faint",
           )}
         >
           {issues.length}
@@ -151,16 +160,19 @@ export default async function AdminDashboard() {
           title="Needs a decision"
           description="New, or reopened because the fix did not hold."
           issues={needsTriage}
+          tone="SUBMITTED"
         />
         <Bucket
           title="Being worked on"
           description="Acknowledged or in progress. Oldest first."
           issues={inProgress}
+          tone="IN_PROGRESS"
         />
         <Bucket
           title="Recently resolved"
           description="Closed with evidence attached."
           issues={recentlyResolved}
+          tone="RESOLVED"
         />
       </div>
     </Shell>

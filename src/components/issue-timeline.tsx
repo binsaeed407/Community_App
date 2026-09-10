@@ -1,6 +1,6 @@
 import type { IssueWithHistory } from "@/lib/issues";
 import { formatDateTime, formatRelative } from "@/lib/format";
-import { STATUS_DOT, STATUS_LABEL } from "@/lib/status";
+import { STATUS_DOT, STATUS_EDGE, STATUS_LABEL } from "@/lib/status";
 import { cx } from "@/components/ui";
 
 /**
@@ -75,7 +75,14 @@ export function IssueTimeline({ history }: { history: IssueWithHistory["history"
                 given" branch to write. That is the point: an unexplained status
                 change cannot be recorded in the first place.
               */}
-              <p className="mt-2.5 rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm leading-relaxed text-ink">
+              {/* Edged in the same colour as its dot, so scanning down the
+                  left of the record gives you the whole history in colour. */}
+              <p
+                className={cx(
+                  "mt-2.5 rounded-lg border border-l-[3px] border-line bg-surface px-3.5 py-2.5 text-sm leading-relaxed text-ink",
+                  STATUS_EDGE[entry.status],
+                )}
+              >
                 {entry.reason}
               </p>
             </div>

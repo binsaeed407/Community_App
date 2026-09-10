@@ -14,16 +14,31 @@ import { DivIcon } from "leaflet";
  * styled div, so there is nothing to load, nothing to 404, and the category
  * emoji can sit inside it for free.
  */
-export function createMarkerIcon(emoji: string, highlighted = false): DivIcon {
-  const ring = highlighted ? "box-shadow:0 0 0 4px rgba(0,0,0,0.15);" : "";
+export function createMarkerIcon(
+  emoji: string,
+  options: { highlighted?: boolean; colourVar?: string } = {},
+): DivIcon {
+  const { highlighted = false, colourVar } = options;
+
+  // Every marker used to be white with the same near-black ring, so a map of
+  // forty reports was forty identical dots and told you nothing until you
+  // clicked one. The ring now carries the issue’s status, which turns the map
+  // into a status view at a glance while the emoji still says the category.
+  //
+  // The colour arrives as a CSS custom property name rather than a hex value,
+  // because this builds a raw HTML string outside React and so cannot use a
+  // Tailwind class — but a var() still resolves against the live theme, so the
+  // markers follow light and dark like everything else.
+  const ring = colourVar ? `var(${colourVar}, #171717)` : "#171717";
+  const halo = highlighted ? "box-shadow:0 0 0 4px color-mix(in srgb, var(--color-brand) 35%, transparent);" : "";
 
   return new DivIcon({
     className: "", // Leaflet adds its own class otherwise, which brings a border.
     html: `<span style="
       display:flex;align-items:center;justify-content:center;
       width:32px;height:32px;border-radius:9999px;
-      background:#fff;border:2px solid #171717;font-size:16px;
-      ${ring}
+      background:var(--color-surface,#fff);border:2.5px solid ${ring};font-size:16px;
+      ${halo}
     ">${emoji}</span>`,
     iconSize: [32, 32],
     // Anchor at the bottom centre so the circle sits above the point it marks,

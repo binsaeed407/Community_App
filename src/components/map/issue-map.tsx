@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import Link from "next/link";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { MAP_DEFAULT_CENTRE, MAP_DEFAULT_ZOOM } from "@/lib/constants";
-import { STATUS_LABEL } from "@/lib/status";
+import { STATUS_DOT_VAR, STATUS_LABEL } from "@/lib/status";
 import { createMarkerIcon } from "./map-marker";
 import type { IssueStatus } from "@/generated/prisma/enums";
 
@@ -50,7 +50,9 @@ export function IssueMap({ issues }: { issues: MapIssue[] }) {
           <Marker
             key={issue.id}
             position={[issue.latitude, issue.longitude]}
-            icon={createMarkerIcon(issue.category.icon)}
+            icon={createMarkerIcon(issue.category.icon, {
+              colourVar: STATUS_DOT_VAR[issue.status],
+            })}
           >
             <Popup>
               <span className="block text-sm font-medium">{issue.title}</span>

@@ -38,33 +38,64 @@ export const STATUS_DESCRIPTION: Record<IssueStatus, string> = {
 };
 
 /**
- * Tailwind classes per status. Colour is never the only signal — every badge
- * also carries its label as text, so this survives being read in greyscale or
- * by someone who cannot distinguish the hues.
+ * Tailwind classes per status, built from design tokens.
+ *
+ * Colour is never the only signal — every badge also carries its label as text
+ * and a solid dot — so the system survives greyscale, a screenshot, and a reader
+ * who cannot distinguish the hues.
+ *
+ * Deliberately NOT Tailwind `dark:` utilities. Those compile to a
+ * prefers-color-scheme media query, which follows the operating system and would
+ * therefore ignore the in-app theme toggle — leaving the six colours that carry
+ * meaning stuck in the wrong mode while everything around them changed.
+ *
+ * SUBMITTED and REJECTED used to be two shades of the same grey, so "nobody has
+ * looked at this yet" and "this was considered and closed" were
+ * indistinguishable — the two states a reporter most needs told apart. SUBMITTED
+ * is now a cool slate (untouched) and REJECTED a warm stone (filed and done).
  */
 export const STATUS_CLASS: Record<IssueStatus, string> = {
-  SUBMITTED:
-    "border-line-strong bg-surface-sunken text-ink-soft",
-  ACKNOWLEDGED:
-    "border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-800/70 dark:bg-sky-950/60 dark:text-sky-200",
-  IN_PROGRESS:
-    "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800/70 dark:bg-amber-950/60 dark:text-amber-200",
-  RESOLVED:
-    "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800/70 dark:bg-emerald-950/60 dark:text-emerald-200",
-  REJECTED:
-    "border-line bg-surface-sunken text-ink-faint",
-  REOPENED:
-    "border-violet-300 bg-violet-50 text-violet-900 dark:border-violet-800/70 dark:bg-violet-950/60 dark:text-violet-200",
+  SUBMITTED: "border-st-submitted-line bg-st-submitted text-st-submitted-ink",
+  ACKNOWLEDGED: "border-st-acknowledged-line bg-st-acknowledged text-st-acknowledged-ink",
+  IN_PROGRESS: "border-st-in-progress-line bg-st-in-progress text-st-in-progress-ink",
+  RESOLVED: "border-st-resolved-line bg-st-resolved text-st-resolved-ink",
+  REJECTED: "border-st-rejected-line bg-st-rejected text-st-rejected-ink",
+  REOPENED: "border-st-reopened-line bg-st-reopened text-st-reopened-ink",
 };
 
-/** The dot on the timeline rail. Solid, so it reads at 10px. */
+/** The solid version, as a background — a badge dot, a bar segment, a marker. */
 export const STATUS_DOT: Record<IssueStatus, string> = {
-  SUBMITTED: "bg-ink-faint",
-  ACKNOWLEDGED: "bg-sky-500",
-  IN_PROGRESS: "bg-amber-500",
-  RESOLVED: "bg-emerald-500",
-  REJECTED: "bg-ink-faint/50",
-  REOPENED: "bg-violet-500",
+  SUBMITTED: "bg-st-submitted-dot",
+  ACKNOWLEDGED: "bg-st-acknowledged-dot",
+  IN_PROGRESS: "bg-st-in-progress-dot",
+  RESOLVED: "bg-st-resolved-dot",
+  REJECTED: "bg-st-rejected-dot",
+  REOPENED: "bg-st-reopened-dot",
+};
+
+/** The solid version, as a border — the accent edge on a card or timeline entry. */
+export const STATUS_EDGE: Record<IssueStatus, string> = {
+  SUBMITTED: "border-st-submitted-dot",
+  ACKNOWLEDGED: "border-st-acknowledged-dot",
+  IN_PROGRESS: "border-st-in-progress-dot",
+  RESOLVED: "border-st-resolved-dot",
+  REJECTED: "border-st-rejected-dot",
+  REOPENED: "border-st-reopened-dot",
+};
+
+/**
+ * The CSS custom property holding the solid colour.
+ *
+ * Needed by the map, which builds its markers as an HTML string outside React
+ * and so cannot use a Tailwind class.
+ */
+export const STATUS_DOT_VAR: Record<IssueStatus, string> = {
+  SUBMITTED: "--color-st-submitted-dot",
+  ACKNOWLEDGED: "--color-st-acknowledged-dot",
+  IN_PROGRESS: "--color-st-in-progress-dot",
+  RESOLVED: "--color-st-resolved-dot",
+  REJECTED: "--color-st-rejected-dot",
+  REOPENED: "--color-st-reopened-dot",
 };
 
 /**

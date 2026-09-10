@@ -60,6 +60,44 @@
   --color-accent: var(--app-accent);
   --color-accent-soft: var(--app-accent-soft);
 
+  /**
+   * Status colours.
+   *
+   * Tokens rather than Tailwind `dark:` utilities. Two reasons: these six
+   * colours carry the only meaning in the app that colour is allowed to carry,
+   * so they belong somewhere a person can read them all at once; and a `dark:`
+   * utility is a media query, which would ignore the theme toggle.
+   *
+   * SUBMITTED and REJECTED used to be two shades of the same grey, which meant
+   * "nobody has looked at this yet" and "this was considered and closed" were
+   * indistinguishable — the two states a reporter most needs told apart.
+   * SUBMITTED is now a cool slate (untouched) and REJECTED a warm stone (filed).
+   */
+  --color-st-submitted: var(--app-st-submitted);
+  --color-st-submitted-ink: var(--app-st-submitted-ink);
+  --color-st-submitted-line: var(--app-st-submitted-line);
+  --color-st-submitted-dot: var(--app-st-submitted-dot);
+  --color-st-acknowledged: var(--app-st-acknowledged);
+  --color-st-acknowledged-ink: var(--app-st-acknowledged-ink);
+  --color-st-acknowledged-line: var(--app-st-acknowledged-line);
+  --color-st-acknowledged-dot: var(--app-st-acknowledged-dot);
+  --color-st-in-progress: var(--app-st-in-progress);
+  --color-st-in-progress-ink: var(--app-st-in-progress-ink);
+  --color-st-in-progress-line: var(--app-st-in-progress-line);
+  --color-st-in-progress-dot: var(--app-st-in-progress-dot);
+  --color-st-resolved: var(--app-st-resolved);
+  --color-st-resolved-ink: var(--app-st-resolved-ink);
+  --color-st-resolved-line: var(--app-st-resolved-line);
+  --color-st-resolved-dot: var(--app-st-resolved-dot);
+  --color-st-rejected: var(--app-st-rejected);
+  --color-st-rejected-ink: var(--app-st-rejected-ink);
+  --color-st-rejected-line: var(--app-st-rejected-line);
+  --color-st-rejected-dot: var(--app-st-rejected-dot);
+  --color-st-reopened: var(--app-st-reopened);
+  --color-st-reopened-ink: var(--app-st-reopened-ink);
+  --color-st-reopened-line: var(--app-st-reopened-line);
+  --color-st-reopened-dot: var(--app-st-reopened-dot);
+
   --radius-card: 0.75rem;
   --radius-control: 0.5rem;
 
@@ -68,6 +106,31 @@
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/**
+ * Make Tailwind's `dark:` variant follow the toggle.
+ *
+ * By default `dark:` compiles to a `prefers-color-scheme` media query, which
+ * means it obeys the operating system and ignores an in-app switch entirely.
+ * There are 75 `dark:` utilities in this codebase — status badges, timeline
+ * chips, alert panels — and without this they would all stay in system mode
+ * while every tokenised colour around them changed. The toggle would look
+ * broken in exactly the places colour carries meaning.
+ *
+ * So the variant is redefined to match what the rest of the theming already
+ * uses: an explicit `data-theme="dark"`, or the system preference when no
+ * explicit choice has been made.
+ */
+@custom-variant dark {
+  &:where(:root[data-theme="dark"], :root[data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
 }
 
 /* -------------------------------------------------------------- switching -- */
@@ -100,7 +163,10 @@
   /* Text. Not pure black on white and not pure white on dark — both buzz. */
   --app-ink: light-dark(#111827, #eef2f9);
   --app-ink-soft: light-dark(#4b5563, #9fb0cb);
-  --app-ink-faint: light-dark(#6b7a91, #6d7f9c);
+  /* 5.17:1 on white and 4.87:1 on the page background. The previous value
+     measured 4.10:1, which fails WCAG AA — and it is the colour of the meta
+     line on every issue card, so it was the most-read text in the app. */
+  --app-ink-faint: light-dark(#5f6e86, #8b9ab4);
 
   /* Brand: a deep confident indigo-blue. Institutional without being cold, and
      far enough from every status hue that a primary button is never mistaken
@@ -115,6 +181,31 @@
      the overdue rule, a "suggested" badge, a stat worth noticing. */
   --app-accent: light-dark(#b45309, #fbbf24);
   --app-accent-soft: light-dark(#fef3c7, #3a2a07);
+
+  --app-st-submitted: light-dark(#edf1fa, #1b2133);
+  --app-st-submitted-ink: light-dark(#3d4560, #b3bdd6);
+  --app-st-submitted-line: light-dark(#cdd7ea, #2c3550);
+  --app-st-submitted-dot: light-dark(#64748b, #94a3b8);
+  --app-st-acknowledged: light-dark(#dff3fe, #07293d);
+  --app-st-acknowledged-ink: light-dark(#075985, #7dd3fc);
+  --app-st-acknowledged-line: light-dark(#a8dcf5, #0d4460);
+  --app-st-acknowledged-dot: light-dark(#0284c7, #38bdf8);
+  --app-st-in-progress: light-dark(#fef2ce, #33220a);
+  --app-st-in-progress-ink: light-dark(#8a4b08, #fcd34d);
+  --app-st-in-progress-line: light-dark(#f3d795, #553a12);
+  --app-st-in-progress-dot: light-dark(#d97706, #fbbf24);
+  --app-st-resolved: light-dark(#d6fbea, #06291f);
+  --app-st-resolved-ink: light-dark(#0a5b43, #6ee7b7);
+  --app-st-resolved-line: light-dark(#9fe6cc, #0d4534);
+  --app-st-resolved-dot: light-dark(#059669, #34d399);
+  --app-st-rejected: light-dark(#f2efea, #24211d);
+  --app-st-rejected-ink: light-dark(#5a544d, #c2bab0);
+  --app-st-rejected-line: light-dark(#ddd6cc, #3a352e);
+  --app-st-rejected-dot: light-dark(#8b8378, #a8a29e);
+  --app-st-reopened: light-dark(#fbe7fe, #33093a);
+  --app-st-reopened-ink: light-dark(#8b1b90, #f0abfc);
+  --app-st-reopened-line: light-dark(#eeb9f2, #54155c);
+  --app-st-reopened-dot: light-dark(#c026d3, #e879f9);
 
   /* Shadows are quiet in light and nearly absent in dark, where elevation is
      carried by surface lightness instead. */

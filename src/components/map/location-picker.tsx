@@ -72,7 +72,7 @@ export function LocationPicker({
         <FollowPin position={position} />
         <Marker
           position={[position.latitude, position.longitude]}
-          icon={createMarkerIcon(emoji, true)}
+          icon={createMarkerIcon(emoji, { highlighted: true })}
           draggable
           eventHandlers={{
             dragend(event) {

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { PublicIssue } from "@/lib/issues";
 import { formatRelative, daysSince } from "@/lib/format";
-import { isOverdue } from "@/lib/status";
+import { isOverdue, STATUS_EDGE } from "@/lib/status";
+import { categoryTint } from "@/lib/categories";
 import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
 import { OverdueBadge, StatusBadge } from "@/components/status-badge";
+import { cx } from "@/components/ui";
 
 /**
  * One issue in a list.
@@ -20,7 +22,14 @@ export function IssueCard({ issue }: { issue: PublicIssue }) {
   return (
     <Link
       href={`/issues/${issue.id}`}
-      className="group flex gap-4 rounded-card border border-line bg-surface p-4 shadow-card transition-all hover:-translate-y-px hover:border-line-strong hover:shadow-raised sm:gap-5 sm:p-5"
+      className={cx(
+        "group flex gap-4 rounded-card border border-l-4 border-line bg-surface p-4 shadow-card transition-all hover:-translate-y-px hover:border-line-strong hover:shadow-raised sm:gap-5 sm:p-5",
+        // The left edge carries the status colour, so a list of twelve cards
+        // shows its status distribution as a column before a single badge is
+        // read. hover:border-line-strong only affects the other three sides
+        // because this rule comes after it.
+        STATUS_EDGE[issue.status],
+      )}
     >
       {photo ? (
         /* Cloudinary already serves a resized, optimised image, so next/image
@@ -36,7 +45,10 @@ export function IssueCard({ issue }: { issue: PublicIssue }) {
       ) : (
         <div
           aria-hidden="true"
-          className="grid h-[72px] w-[72px] shrink-0 place-items-center rounded-lg bg-surface-sunken text-2xl sm:h-20 sm:w-20"
+          className={cx(
+            "grid h-[72px] w-[72px] shrink-0 place-items-center rounded-lg text-2xl sm:h-20 sm:w-20",
+            categoryTint(issue.category.slug),
+          )}
         >
           {issue.category.icon}
         </div>
@@ -63,11 +75,10 @@ export function IssueCard({ issue }: { issue: PublicIssue }) {
           <span className="truncate">{issue.addressLabel}</span>
           <span aria-hidden="true">·</span>
           <time dateTime={issue.createdAt.toISOString()}>{formatRelative(issue.createdAt)}</time>
-          {/* The update count is the interesting number on this card: it is how
-              much has actually happened, as opposed to how long ago it was
-              filed. */}
           <span aria-hidden="true">·</span>
-          <span className="font-medium text-ink-soft">
+          {/* How much has actually happened is the interesting number on a list
+              about accountability, so it is the one coloured thing on the card. */}
+          <span className="font-semibold text-brand">
             {updates} update{updates === 1 ? "" : "s"}
           </span>
         </p>
