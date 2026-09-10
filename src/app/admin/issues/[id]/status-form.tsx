@@ -16,7 +16,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:opacity-60 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
+      className="inline-flex h-10 items-center justify-center rounded-control bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink-soft disabled:opacity-55"
     >
       {pending ? "Saving…" : label}
     </button>
@@ -49,7 +49,7 @@ export function StatusForm({
 
   if (options.length === 0) {
     return (
-      <p className="rounded-lg border border-neutral-200 p-4 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
+      <p className="rounded-card border border-line bg-surface-sunken p-4 text-sm text-ink-soft">
         This issue is {STATUS_LABEL[currentStatus].toLowerCase()} and cannot be moved from here.
         Only the person who reported it can reopen it — which is the point: an outcome you can
         withdraw at will is not an outcome.
@@ -87,8 +87,8 @@ export function StatusForm({
               key={option}
               className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm transition ${
                 selected === option
-                  ? "border-neutral-900 bg-neutral-900 text-white dark:border-neutral-100 dark:bg-neutral-100 dark:text-neutral-900"
-                  : "border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                  ? "border-ink bg-ink text-paper"
+                  : "border-line-strong bg-surface text-ink-soft hover:border-ink-faint hover:text-ink"
               }`}
             >
               <input
@@ -119,9 +119,9 @@ export function StatusForm({
           placeholder="Inspected this morning; the defect is confirmed and booked for repair on Thursday."
           aria-describedby={state.fieldErrors.reason ? "reason-error" : "reason-hint"}
           aria-invalid={Boolean(state.fieldErrors.reason)}
-          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100"
+          className="w-full "
         />
-        <p id="reason-hint" className="text-xs text-neutral-500">
+        <p id="reason-hint" className="text-xs text-ink-faint">
           This is published on the public timeline, under your name, permanently. It cannot be
           edited or deleted afterwards.
         </p>
@@ -133,9 +133,9 @@ export function StatusForm({
       </div>
 
       {needsPhoto ? (
-        <fieldset className="flex flex-col gap-2 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+        <fieldset className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
           <legend className="px-1 text-sm font-medium">Evidence</legend>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-ink-faint">
             Marking something resolved requires a photo of the finished work. It is the one claim
             here a resident cannot check for themselves.
           </p>

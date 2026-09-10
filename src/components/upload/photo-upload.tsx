@@ -82,7 +82,7 @@ export function PhotoUpload({ disabled }: { disabled?: boolean }) {
 
   if (disabled) {
     return (
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-ink-faint">
         Photo upload is not configured on this deployment, so reports are text-only for now.
       </p>
     );
@@ -91,7 +91,7 @@ export function PhotoUpload({ disabled }: { disabled?: boolean }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-3">
-        <label className="cursor-pointer rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+        <label className="cursor-pointer inline-flex h-9 items-center justify-center rounded-control border border-line-strong bg-surface px-3 text-sm font-medium transition-colors hover:bg-surface-sunken">
           {busy ? "Uploading…" : "Add a photo"}
           <input
             ref={inputRef}
@@ -105,7 +105,7 @@ export function PhotoUpload({ disabled }: { disabled?: boolean }) {
             }}
           />
         </label>
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-ink-faint">
           {photos.length} of {MAX_PHOTOS} · optional
         </span>
       </div>
@@ -124,14 +124,14 @@ export function PhotoUpload({ disabled }: { disabled?: boolean }) {
               <img
                 src={photo.url}
                 alt="Photo you attached to this report"
-                className="h-20 w-20 rounded-md object-cover"
+                className="h-20 w-20 rounded-lg border border-line object-cover"
               />
               <button
                 type="button"
                 onClick={() =>
                   setPhotos((current) => current.filter((p) => p.publicId !== photo.publicId))
                 }
-                className="absolute -right-2 -top-2 rounded-full border border-neutral-300 bg-white px-1.5 text-xs shadow-sm dark:border-neutral-600 dark:bg-neutral-900"
+                className="absolute -right-2 -top-2 rounded-full border border-line-strong bg-surface px-1.5 text-xs shadow-card"
                 aria-label="Remove this photo"
               >
                 ✕

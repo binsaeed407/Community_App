@@ -1,13 +1,11 @@
 "use client";
 
+import { fieldClass } from "@/components/ui";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { MIN_PASSWORD_LENGTH } from "@/lib/validation/auth";
 import { signUpAction } from "./actions";
 import { emptyFormState } from "@/lib/form-state";
-
-const inputClass =
-  "rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -16,7 +14,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 disabled:opacity-60 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
+      className="inline-flex h-10 w-full items-center justify-center rounded-control bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-soft disabled:opacity-55"
     >
       {pending ? "Creating your account…" : "Create account"}
     </button>
@@ -62,9 +60,9 @@ export function SignUpForm() {
             fieldErrors.displayName ? "displayName-error" : "displayName-hint"
           }
           aria-invalid={Boolean(fieldErrors.displayName)}
-          className={inputClass}
+          className={fieldClass}
         />
-        <p id="displayName-hint" className="text-xs text-neutral-500">
+        <p id="displayName-hint" className="text-xs text-ink-faint">
           Shown on your reports. Your email address is never shown publicly.
         </p>
         <FieldError id="displayName-error" messages={fieldErrors.displayName} />
@@ -82,7 +80,7 @@ export function SignUpForm() {
           required
           aria-describedby={fieldErrors.email ? "email-error" : undefined}
           aria-invalid={Boolean(fieldErrors.email)}
-          className={inputClass}
+          className={fieldClass}
         />
         <FieldError id="email-error" messages={fieldErrors.email} />
       </div>
@@ -100,9 +98,9 @@ export function SignUpForm() {
           minLength={MIN_PASSWORD_LENGTH}
           aria-describedby={fieldErrors.password ? "password-error" : "password-hint"}
           aria-invalid={Boolean(fieldErrors.password)}
-          className={inputClass}
+          className={fieldClass}
         />
-        <p id="password-hint" className="text-xs text-neutral-500">
+        <p id="password-hint" className="text-xs text-ink-faint">
           At least {MIN_PASSWORD_LENGTH} characters.
         </p>
         <FieldError id="password-error" messages={fieldErrors.password} />

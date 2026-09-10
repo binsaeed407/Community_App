@@ -78,13 +78,13 @@ export default async function HealthPage() {
   return (
     <main className="mx-auto flex max-w-2xl flex-1 flex-col justify-center gap-6 px-6 py-16">
       <div>
-        <p className="text-sm font-medium uppercase tracking-widest text-neutral-500">
+        <p className="text-sm font-medium uppercase tracking-widest text-ink-faint">
           Diagnostics
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
           Database health check
         </h1>
-        <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+        <p className="mt-2 text-ink-soft">
           Confirms that this app can reach the Postgres database through Prisma, and that the
           status history and the status cache still agree.
         </p>

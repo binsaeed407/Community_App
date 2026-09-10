@@ -18,7 +18,7 @@ import type { MapIssue } from "./issue-map";
 const IssueMap = dynamic(() => import("./issue-map").then((m) => m.IssueMap), {
   ssr: false,
   loading: () => (
-    <div className="h-[min(70vh,600px)] w-full animate-pulse rounded-lg border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900" />
+    <div className="h-[min(70vh,600px)] w-full animate-pulse rounded-card border border-line bg-surface-sunken" />
   ),
 });
 

@@ -28,7 +28,7 @@ export type MapIssue = {
  */
 export function IssueMap({ issues }: { issues: MapIssue[] }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800">
+    <div className="overflow-hidden rounded-card border border-line">
       <MapContainer
         center={[MAP_DEFAULT_CENTRE.latitude, MAP_DEFAULT_CENTRE.longitude]}
         zoom={MAP_DEFAULT_ZOOM - 2}
@@ -54,7 +54,7 @@ export function IssueMap({ issues }: { issues: MapIssue[] }) {
           >
             <Popup>
               <span className="block text-sm font-medium">{issue.title}</span>
-              <span className="mt-0.5 block text-xs text-neutral-600">
+              <span className="mt-0.5 block text-xs text-ink-soft">
                 {STATUS_LABEL[issue.status]} · {issue.addressLabel}
               </span>
               <Link href={`/issues/${issue.id}`} className="mt-1 block text-xs underline">

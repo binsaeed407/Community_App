@@ -1,5 +1,6 @@
 "use client";
 
+import { fieldClass } from "@/components/ui";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { signInAction, type SignInState } from "./actions";
@@ -16,7 +17,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 disabled:opacity-60 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
+      className="inline-flex h-10 w-full items-center justify-center rounded-control bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-soft disabled:opacity-55"
     >
       {pending ? "Signing in…" : "Sign in"}
     </button>
@@ -49,7 +50,7 @@ export function SignInForm() {
           type="email"
           autoComplete="email"
           required
-          className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100"
+          className={fieldClass}
         />
       </div>
 
@@ -63,7 +64,7 @@ export function SignInForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100"
+          className={fieldClass}
         />
       </div>
 

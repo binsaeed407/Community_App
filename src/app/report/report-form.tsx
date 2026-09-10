@@ -1,5 +1,6 @@
 "use client";
 
+import { fieldClass } from "@/components/ui";
 import { useActionState, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useFormStatus } from "react-dom";
@@ -22,13 +23,10 @@ const LocationPicker = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[320px] w-full animate-pulse rounded-md border border-neutral-300 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900" />
+      <div className="h-[320px] w-full animate-pulse rounded-card border border-line bg-surface-sunken" />
     ),
   },
 );
-
-const inputClass =
-  "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -36,7 +34,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:opacity-60 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
+      className="inline-flex h-10 items-center justify-center rounded-control bg-ink px-5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft disabled:opacity-55"
     >
       {pending ? "Sending your report…" : "Send report"}
     </button>
@@ -152,7 +150,7 @@ export function ReportForm({
           }}
           aria-describedby={fieldErrors.categoryId ? "categoryId-error" : undefined}
           aria-invalid={Boolean(fieldErrors.categoryId)}
-          className={inputClass}
+          className={fieldClass}
         >
           <option value="" disabled>
             Choose a category
@@ -168,7 +166,7 @@ export function ReportForm({
             <span className="inline-flex items-center rounded-full border border-blue-300 bg-blue-50 px-2 py-0.5 font-medium text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
               Suggested
             </span>
-            <span className="text-neutral-500">
+            <span className="text-ink-faint">
               Picked from what you wrote. Change it if it is wrong.
             </span>
           </p>
@@ -193,9 +191,9 @@ export function ReportForm({
           }
           aria-describedby={fieldErrors.title ? "title-error" : "title-hint"}
           aria-invalid={Boolean(fieldErrors.title)}
-          className={inputClass}
+          className={fieldClass}
         />
-        <p id="title-hint" className="text-xs text-neutral-500">
+        <p id="title-hint" className="text-xs text-ink-faint">
           One line. What would you say to someone on the phone?
         </p>
         <FieldError id="title-error" messages={fieldErrors.title} />
@@ -218,15 +216,15 @@ export function ReportForm({
           }
           aria-describedby={fieldErrors.description ? "description-error" : "description-hint"}
           aria-invalid={Boolean(fieldErrors.description)}
-          className={inputClass}
+          className={fieldClass}
         />
-        <p id="description-hint" className="text-xs text-neutral-500">
+        <p id="description-hint" className="text-xs text-ink-faint">
           Detail helps whoever picks this up decide how urgent it is.
         </p>
         <FieldError id="description-error" messages={fieldErrors.description} />
       </div>
 
-      <fieldset className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+      <fieldset className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4">
         <legend className="px-1 text-sm font-medium">Where is it?</legend>
 
         <div className="flex flex-col gap-1.5">
@@ -243,9 +241,9 @@ export function ReportForm({
               fieldErrors.addressLabel ? "addressLabel-error" : "addressLabel-hint"
             }
             aria-invalid={Boolean(fieldErrors.addressLabel)}
-            className={inputClass}
+            className={fieldClass}
           />
-          <p id="addressLabel-hint" className="text-xs text-neutral-500">
+          <p id="addressLabel-hint" className="text-xs text-ink-faint">
             Please do not enter a full home address — this is shown publicly.
           </p>
           <FieldError id="addressLabel-error" messages={fieldErrors.addressLabel} />
@@ -253,7 +251,7 @@ export function ReportForm({
 
         <LocationPicker position={position} onPick={setPosition} emoji={pinEmoji} />
 
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-ink-faint">
           Click the map or drag the pin to place it exactly. If you would rather not, the street
           name above is enough.
         </p>
@@ -263,11 +261,11 @@ export function ReportForm({
             type="button"
             onClick={useMyLocation}
             disabled={locating}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium transition hover:bg-neutral-100 disabled:opacity-60 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="inline-flex h-9 items-center justify-center rounded-control border border-line-strong bg-surface px-3 text-sm font-medium transition-colors hover:bg-surface-sunken disabled:opacity-55"
           >
             {locating ? "Finding you…" : "Use my current location"}
           </button>
-          <p className="font-mono text-xs text-neutral-500">
+          <p className="font-mono text-xs text-ink-faint">
             {position.latitude.toFixed(5)}, {position.longitude.toFixed(5)}
           </p>
         </div>
@@ -287,9 +285,9 @@ export function ReportForm({
         <FieldError id="longitude-error" messages={fieldErrors.longitude} />
       </fieldset>
 
-      <fieldset className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+      <fieldset className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4">
         <legend className="px-1 text-sm font-medium">Photos</legend>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-ink-faint">
           A photo makes a report far harder to dismiss. Please avoid including faces or number
           plates — this is published publicly.
         </p>

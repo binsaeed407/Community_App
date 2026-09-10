@@ -12,7 +12,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:opacity-60 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
+      className="inline-flex h-9 items-center justify-center rounded-control bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink-soft disabled:opacity-55"
     >
       {pending ? "Reopening…" : "Reopen this report"}
     </button>
@@ -46,16 +46,16 @@ export function ReopenForm({ issueId }: { issueId: string }) {
 
   if (!open) {
     return (
-      <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+      <div className="rounded-card border border-line bg-surface p-4">
         <p className="text-sm font-medium">Is this actually fixed?</p>
-        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="mt-1 text-sm text-ink-soft">
           You reported this, so you can reopen it if the problem is still there. Nothing gets
           deleted — your reason is added to the timeline underneath what was already said.
         </p>
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          className="mt-3 inline-flex h-9 items-center justify-center rounded-control border border-line-strong bg-surface px-3 text-sm font-medium transition-colors hover:bg-surface-sunken"
         >
           No, it is not fixed
         </button>
@@ -66,7 +66,7 @@ export function ReopenForm({ issueId }: { issueId: string }) {
   return (
     <form
       action={formAction}
-      className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+      className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4"
     >
       <input type="hidden" name="issueId" value={issueId} />
 
@@ -90,13 +90,13 @@ export function ReopenForm({ issueId }: { issueId: string }) {
         minLength={REASON_MIN}
         placeholder="The pothole was filled but the filling has already sunk and it is as deep as before."
         aria-invalid={Boolean(state.fieldErrors.reason)}
-        className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:focus-visible:border-neutral-100"
+        className="w-full "
       />
       {state.fieldErrors.reason ? (
         <p className="text-sm text-red-700 dark:text-red-300">{state.fieldErrors.reason[0]}</p>
       ) : null}
 
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-ink-faint">
         This is published publicly under your display name.
       </p>
 
@@ -105,7 +105,7 @@ export function ReopenForm({ issueId }: { issueId: string }) {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="rounded-md border border-neutral-300 px-4 py-2 text-sm transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          className="inline-flex h-9 items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-sm transition-colors hover:bg-surface-sunken"
         >
           Cancel
         </button>

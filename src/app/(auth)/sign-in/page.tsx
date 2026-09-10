@@ -15,7 +15,7 @@ export default async function SignInPage() {
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-6 py-16">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
-        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="mt-2 text-sm text-ink-soft">
           You need an account to report a problem. Browsing reports does not require one.
         </p>
       </div>
@@ -27,9 +27,9 @@ export default async function SignInPage() {
         because the person most likely to open this app has been sent a link and
         will not read a repository first.
       */}
-      <div className="rounded-md border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded-card border border-line bg-surface-sunken p-4 text-sm">
         <p className="font-medium">Try it without signing up</p>
-        <dl className="mt-2 space-y-1 text-neutral-600 dark:text-neutral-400">
+        <dl className="mt-2 space-y-1 text-ink-soft">
           <div className="flex justify-between gap-4">
             <dt>Citizen</dt>
             <dd className="font-mono text-xs">demo-citizen@example.com</dd>
@@ -45,9 +45,9 @@ export default async function SignInPage() {
         </dl>
       </div>
 
-      <p className="text-sm text-neutral-600 dark:text-neutral-400">
+      <p className="text-sm text-ink-soft">
         No account?{" "}
-        <Link href="/sign-up" className="font-medium text-neutral-900 underline dark:text-neutral-100">
+        <Link href="/sign-up" className="font-medium text-accent underline underline-offset-4">
           Create one
         </Link>
       </p>

@@ -9,13 +9,13 @@
 export default function Loading() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10" aria-hidden="true">
-      <div className="h-9 w-64 animate-pulse rounded bg-neutral-200 dark:bg-neutral-800" />
-      <div className="mt-3 h-4 w-40 animate-pulse rounded bg-neutral-200 dark:bg-neutral-800" />
+      <div className="h-9 w-64 animate-pulse rounded bg-surface-sunken" />
+      <div className="mt-3 h-4 w-40 animate-pulse rounded bg-surface-sunken" />
       <ul className="mt-10 flex flex-col gap-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <li
             key={index}
-            className="h-28 animate-pulse rounded-lg bg-neutral-100 dark:bg-neutral-900"
+            className="h-28 animate-pulse rounded-lg bg-surface-sunken"
           />
         ))}
       </ul>

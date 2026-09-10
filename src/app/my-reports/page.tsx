@@ -36,7 +36,7 @@ export default async function MyReportsPage({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">My reports</h1>
-          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="mt-1 text-sm text-ink-soft">
             {total === 0
               ? "You have not reported anything yet."
               : `${total} report${total === 1 ? "" : "s"}, ${stillOpen} still open on this page.`}
@@ -44,16 +44,16 @@ export default async function MyReportsPage({
         </div>
         <Link
           href="/report"
-          className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
+          className="inline-flex h-9 items-center justify-center rounded-control bg-ink px-3 text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
         >
           Report a problem
         </Link>
       </div>
 
       {issues.length === 0 ? (
-        <div className="mt-10 rounded-lg border border-dashed border-neutral-300 p-10 text-center dark:border-neutral-700">
+        <div className="mt-10 rounded-card border border-dashed border-line-strong p-10 text-center">
           <p className="font-medium">Nothing here yet</p>
-          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="mt-1 text-sm text-ink-soft">
             When you report a problem it will appear here, along with everything that happens to it
             afterwards.
           </p>
@@ -80,7 +80,7 @@ export default async function MyReportsPage({
           ) : (
             <span />
           )}
-          <span className="text-neutral-500">
+          <span className="text-ink-faint">
             Page {page} of {pageCount}
           </span>
           {page < pageCount ? (

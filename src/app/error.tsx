@@ -25,26 +25,26 @@ export default function Error({
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-4 px-6 py-16 text-center">
-      <p className="text-sm font-medium uppercase tracking-widest text-neutral-500">Error</p>
+      <p className="text-sm font-medium uppercase tracking-widest text-ink-faint">Error</p>
       <h1 className="text-2xl font-bold tracking-tight">Something went wrong</h1>
-      <p className="text-neutral-600 dark:text-neutral-400">
+      <p className="text-ink-soft">
         This is a problem at our end, not something you did. Nothing you were working on has been
         lost.
       </p>
       {error.digest ? (
-        <p className="font-mono text-xs text-neutral-500">Reference: {error.digest}</p>
+        <p className="font-mono text-xs text-ink-faint">Reference: {error.digest}</p>
       ) : null}
       <div className="mt-2 flex flex-wrap justify-center gap-3">
         <button
           type="button"
           onClick={reset}
-          className="rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
+          className="inline-flex h-10 items-center justify-center rounded-control bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
         >
           Try again
         </button>
         <Link
           href="/issues"
-          className="rounded-md border border-neutral-300 px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          className="inline-flex h-10 items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-sm font-medium transition-colors hover:bg-surface-sunken"
         >
           Back to the issues
         </Link>

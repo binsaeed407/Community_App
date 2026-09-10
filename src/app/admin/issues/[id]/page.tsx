@@ -49,13 +49,13 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
       <div className="mt-6 flex flex-wrap items-center gap-2">
         <StatusBadge status={issue.status} />
         {overdue ? <OverdueBadge /> : null}
-        <span className="text-sm text-neutral-500">
+        <span className="text-sm text-ink-faint">
           <span aria-hidden="true">{issue.category.icon}</span> {issue.category.name}
         </span>
       </div>
 
       <h1 className="mt-3 text-2xl font-bold tracking-tight">{issue.title}</h1>
-      <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+      <p className="mt-1 text-sm text-ink-soft">
         {issue.addressLabel} · reported by {issue.reporter.displayName} ·{" "}
         {daysSince(issue.createdAt)} days old
       </p>
@@ -76,9 +76,9 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
         </div>
       ) : null}
 
-      <section className="mt-10 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+      <section className="mt-10 rounded-card border border-line bg-surface p-5">
         <h2 className="text-lg font-semibold tracking-tight">Update this issue</h2>
-        <p className="mb-4 mt-1 text-xs text-neutral-500">
+        <p className="mb-4 mt-1 text-xs text-ink-faint">
           Every change appends to the public timeline and writes an audit entry. Nothing here can
           be edited or removed later.
         </p>
@@ -92,7 +92,7 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
 
       <section className="mt-10">
         <h2 className="text-lg font-semibold tracking-tight">Public timeline</h2>
-        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="mt-1 text-sm text-ink-soft">
           Exactly what the reporter and anyone else can read.
         </p>
         <IssueTimeline history={issue.history} />
@@ -100,7 +100,7 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
 
       {evidence.length > 0 ? (
         <section className="mt-8">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-ink-faint">
             Evidence on file
           </h2>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -119,24 +119,24 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
 
       <section className="mt-10">
         <h2 className="text-lg font-semibold tracking-tight">Audit trail</h2>
-        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="mt-1 text-sm text-ink-soft">
           Internal record. Never shown on a public page.
         </p>
 
         {audit.length === 0 ? (
-          <p className="mt-3 text-sm text-neutral-500">No administrative actions recorded yet.</p>
+          <p className="mt-3 text-sm text-ink-faint">No administrative actions recorded yet.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-neutral-200 text-sm dark:divide-neutral-800">
+          <ul className="mt-3 divide-y divide-line text-sm">
             {audit.map((entry) => (
               <li key={entry.id} className="py-3">
-                <p className="font-mono text-xs text-neutral-500">{entry.action}</p>
+                <p className="font-mono text-xs text-ink-faint">{entry.action}</p>
                 <p className="mt-1">
                   <span className="font-medium">{entry.actor.displayName}</span>{" "}
-                  <span className="text-neutral-500">
+                  <span className="text-ink-faint">
                     · {entry.actor.role.toLowerCase()} · {formatDateTime(entry.createdAt)}
                   </span>
                 </p>
-                <p className="mt-1 text-neutral-700 dark:text-neutral-300">{entry.reason}</p>
+                <p className="mt-1 text-ink">{entry.reason}</p>
               </li>
             ))}
           </ul>

@@ -49,7 +49,7 @@ export function LocationPicker({
   emoji?: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-md border border-neutral-300 dark:border-neutral-700">
+    <div className="overflow-hidden rounded-card border border-line">
       <MapContainer
         center={[position.latitude, position.longitude]}
         zoom={MAP_DEFAULT_ZOOM}

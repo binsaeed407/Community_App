@@ -21,7 +21,7 @@ export default async function ReportPage() {
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
       <h1 className="text-3xl font-bold tracking-tight">Report a problem</h1>
-      <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+      <p className="mt-2 text-ink-soft">
         This becomes a public record. Anyone can read it, and you will be able to see exactly what
         happens to it.
       </p>
