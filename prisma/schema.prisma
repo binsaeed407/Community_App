@@ -80,6 +80,8 @@ model Category {
   sortOrder Int @default(0)
 
   issues Issue[]
+  suggestedFor AIAnalysis[]
+
 }
 
 // ---------------------------------------------------------------------------
@@ -137,6 +139,9 @@ model Issue {
   /// Photos: what the citizen reported, and what the admin used as proof of
   /// resolution.
   attachments Attachment[]
+
+  /// At most one suggestion per issue, recorded at submission time.
+  suggestion AIAnalysis?
 
   /// Serves the admin dashboard's status buckets and the public "newest first" list.
   @@index([status, createdAt])
@@ -258,4 +263,46 @@ model AuditLog {
   @@index([entityType, entityId, createdAt])
   /// Serves "show me everything this administrator did".
   @@index([actorId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Automated category suggestion
+// ---------------------------------------------------------------------------
+
+/// One row per issue, recording what the classifier suggested and whether the
+/// reporter kept it.
+///
+/// The `accepted` flag is the interesting part: because it is stored, the app
+/// can report its own accuracy honestly instead of claiming a number. A
+/// classifier nobody agrees with should be visible as such.
+///
+/// Named AIAnalysis rather than CategorySuggestion because the PRD uses that
+/// name and the table is meant to survive swapping the rule-based classifier
+/// for a model-based one.
+model AIAnalysis {
+  id String @id @default(cuid())
+
+  issueId String @unique
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  /// Null when the classifier had nothing confident enough to suggest. That is
+  /// a normal outcome, not an error.
+  suggestedCategoryId String?
+  suggestedCategory   Category? @relation(fields: [suggestedCategoryId], references: [id])
+
+  /// 0 to 1. Compared against a floor below which nothing is shown to the user.
+  confidence Float
+
+  /// Whether the reporter submitted with the suggested category still selected.
+  accepted Boolean
+
+  /// Which implementation produced this, e.g. "rules@1". Kept so the accuracy
+  /// figures stay meaningful after the classifier is changed.
+  source String
+
+  /// The raw scores behind the decision, for debugging why a suggestion was
+  /// wrong. Json rather than a table because nothing ever queries inside it.
+  rawOutput Json?
+
+  createdAt DateTime @default(now())
 }
