@@ -55,6 +55,9 @@ model User {
 
   uploads Attachment[]
 
+  /// Actions this person took that the app considers consequential.
+  auditEntries AuditLog[]
+
 }
 
 // ---------------------------------------------------------------------------
@@ -214,4 +217,45 @@ model Attachment {
 
   /// Serves "show me the evidence photo for this issue" on the detail page.
   @@index([issueId, kind])
+}
+
+// ---------------------------------------------------------------------------
+// Audit log
+// ---------------------------------------------------------------------------
+
+/// A record of every consequential action, written in the same transaction as
+/// the action itself — so an action can never exist without its audit entry.
+///
+/// This overlaps with IssueStatusHistory on purpose. The history table is the
+/// public timeline, written for citizens and shown on the issue page. This one
+/// is the internal record, covering things that never appear publicly: an admin
+/// editing a category, a login role change, an issue being hidden. They answer
+/// different questions and are read by different people.
+///
+/// entityType and entityId are loose strings rather than a foreign key because
+/// this table has to be able to describe rows in tables it does not know about,
+/// including ones added later. The trade-off is that the database cannot
+/// enforce that the target exists.
+model AuditLog {
+  id String @id @default(cuid())
+
+  actorId String
+  actor   User   @relation(fields: [actorId], references: [id])
+
+  /// A short verb phrase, e.g. "issue.status_changed", "issue.update_posted".
+  action String
+
+  entityType String
+  entityId   String
+
+  /// The actor's stated justification. Required for the same reason it is
+  /// required on a status change: an unexplained action is not accountable.
+  reason String
+
+  createdAt DateTime @default(now())
+
+  /// Serves "show me everything that happened to this issue".
+  @@index([entityType, entityId, createdAt])
+  /// Serves "show me everything this administrator did".
+  @@index([actorId, createdAt])
 }
