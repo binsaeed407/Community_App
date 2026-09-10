@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 
 /**
@@ -11,6 +12,10 @@ import { resolve } from "node:path";
  * can drift from the history. Rendering React in a fake DOM to assert that a
  * heading says "Sign in" would cost more to maintain than it could ever catch.
  */
+// Vitest does not read .env the way Next.js does, so the database invariant
+// test would see no DATABASE_URL and skip itself even when one is configured.
+loadEnv();
+
 export default defineConfig({
   test: {
     environment: "node",
