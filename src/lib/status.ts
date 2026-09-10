@@ -44,17 +44,27 @@ export const STATUS_DESCRIPTION: Record<IssueStatus, string> = {
  */
 export const STATUS_CLASS: Record<IssueStatus, string> = {
   SUBMITTED:
-    "border-neutral-300 bg-neutral-100 text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200",
+    "border-line-strong bg-surface-sunken text-ink-soft",
   ACKNOWLEDGED:
-    "border-blue-300 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100",
+    "border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-800/70 dark:bg-sky-950/60 dark:text-sky-200",
   IN_PROGRESS:
-    "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100",
+    "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800/70 dark:bg-amber-950/60 dark:text-amber-200",
   RESOLVED:
-    "border-green-300 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-100",
+    "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800/70 dark:bg-emerald-950/60 dark:text-emerald-200",
   REJECTED:
-    "border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400",
+    "border-line bg-surface-sunken text-ink-faint",
   REOPENED:
-    "border-purple-300 bg-purple-50 text-purple-900 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-100",
+    "border-violet-300 bg-violet-50 text-violet-900 dark:border-violet-800/70 dark:bg-violet-950/60 dark:text-violet-200",
+};
+
+/** The dot on the timeline rail. Solid, so it reads at 10px. */
+export const STATUS_DOT: Record<IssueStatus, string> = {
+  SUBMITTED: "bg-ink-faint",
+  ACKNOWLEDGED: "bg-sky-500",
+  IN_PROGRESS: "bg-amber-500",
+  RESOLVED: "bg-emerald-500",
+  REJECTED: "bg-ink-faint/50",
+  REOPENED: "bg-violet-500",
 };
 
 /**
