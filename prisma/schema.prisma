@@ -11,14 +11,6 @@ datasource db {
   provider = "postgresql"
 }
 
-/// Phase 0 only. This model exists to prove the chain
-/// app -> Prisma -> Neon actually works end to end.
-/// It is deleted in Phase 1 when the real models arrive.
-model HealthCheck {
-  id        String   @id @default(cuid())
-  message   String
-  createdAt DateTime @default(now())
-}
 
 // ---------------------------------------------------------------------------
 // People
