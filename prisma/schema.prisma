@@ -49,6 +49,10 @@ model User {
   createdAt DateTime @default(now())
 
   reportedIssues Issue[]
+  /// Status changes this person made. An admin accumulates these; a citizen
+  /// has exactly one per issue they reported (the initial SUBMITTED row).
+  statusChanges IssueStatusHistory[]
+
 }
 
 // ---------------------------------------------------------------------------
@@ -122,8 +126,48 @@ model Issue {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  /// Every status this issue has ever been in, oldest first. Append-only.
+  history IssueStatusHistory[]
+
   /// Serves the admin dashboard's status buckets and the public "newest first" list.
   @@index([status, createdAt])
   /// Serves the category filter on the public list.
   @@index([categoryId])
+}
+
+// ---------------------------------------------------------------------------
+// Status history — the heart of the whole project
+// ---------------------------------------------------------------------------
+
+/// Append-only. This is the source of truth for an issue's status.
+///
+/// Status is not a field that gets overwritten, because a field that can be
+/// overwritten can be quietly rewritten — and then the public timeline is
+/// theatre rather than evidence. Instead every change adds a row, the current
+/// status is the newest row, and reopening an issue appends rather than
+/// resetting, so the earlier history survives it.
+///
+/// Nothing in this application ever issues an UPDATE or a DELETE against this
+/// table. That is enforced by convention and by review, not by the database —
+/// which is worth saying out loud rather than pretending otherwise.
+model IssueStatusHistory {
+  id String @id @default(cuid())
+
+  issueId String
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  status IssueStatus
+
+  /// Why this change was made, in the actor's own words. Required — an
+  /// unexplained status change is exactly what this table exists to prevent.
+  reason String
+
+  actorId String
+  actor   User   @relation(fields: [actorId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  /// Serves the timeline on the issue detail page, and the "what is the current
+  /// status" lookup used to verify the cache on Issue.
+  @@index([issueId, createdAt])
 }
