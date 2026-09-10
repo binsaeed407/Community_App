@@ -26,6 +26,31 @@ export const BOUNDS = {
   maxLongitude: 0.34,
 } as const;
 
+/**
+ * A photo URL.
+ *
+ * `z.url()` alone is not enough: it accepts `javascript:alert(1)`, which is a
+ * perfectly valid URL and an absolutely unacceptable thing to store and later
+ * render into an attribute. A test caught this.
+ *
+ * The only URLs this app should ever store are the ones Cloudinary just handed
+ * back, so the check is narrowed to exactly that: https, on Cloudinary's
+ * delivery host. Anything else is either a mistake or an attempt.
+ */
+const CLOUDINARY_DELIVERY_HOST = "res.cloudinary.com";
+
+const photoUrl = z.string().refine(
+  (value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" && url.hostname === CLOUDINARY_DELIVERY_HOST;
+    } catch {
+      return false;
+    }
+  },
+  { message: "That photo could not be verified." },
+);
+
 export const issueSchema = z.object({
   title: z
     .string()
@@ -69,7 +94,7 @@ export const issueSchema = z.object({
   photos: z
     .array(
       z.object({
-        url: z.url(),
+        url: photoUrl,
         publicId: z.string().min(1),
       }),
     )
