@@ -1,26 +1,123 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/**
+ * Design tokens.
+ *
+ * Every colour, radius and shadow in the app comes from here. The point is not
+ * tidiness — it is that "make the borders softer" is one edit rather than a
+ * search across forty files, and that light and dark stay in step because they
+ * are defined side by side.
+ *
+ * The palette is deliberately restrained: warm paper, near-black ink, and a
+ * single teal accent. All the actual hue in the interface is carried by the
+ * status colours, because in this app colour means something — a badge is the
+ * difference between "we are working on it" and "we closed it". A decorative
+ * brand colour competing with those would make the meaningful ones quieter.
+ */
+@theme {
+  /* Surfaces, warm rather than pure grey. Pure #fff under a lot of text reads
+     clinical; a few degrees of warmth reads like paper. */
+  --color-paper: #fbfaf8;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f4f2ef;
+  --color-line: #e6e3dd;
+  --color-line-strong: #d3cfc7;
+
+  /* Text. Not pure black: #111 against white is sharp enough to read and soft
+     enough not to buzz. */
+  --color-ink: #16161a;
+  --color-ink-soft: #55555f;
+  --color-ink-faint: #85858f;
+
+  /* The one accent. Links, focus rings, and the active state of a control. */
+  --color-accent: #0f766e;
+  --color-accent-soft: #e6f2f1;
+  --color-accent-strong: #115e59;
+
+  --radius-card: 0.75rem;
+  --radius-control: 0.5rem;
+
+  /* Shadows are barely there on purpose. This is a document, not a dashboard
+     from 2014. */
+  --shadow-card: 0 1px 2px rgb(22 22 26 / 0.04), 0 1px 3px rgb(22 22 26 / 0.06);
+  --shadow-raised: 0 2px 4px rgb(22 22 26 / 0.04), 0 6px 16px rgb(22 22 26 / 0.08);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/**
+ * Dark mode.
+ *
+ * Not an inversion. Inverting a warm light palette gives a cold blue-grey dark
+ * one, so the dark surfaces keep a trace of the same warmth and the accent is
+ * lifted, because a mid-tone teal that reads well on paper disappears on
+ * charcoal.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  @theme {
+    --color-paper: #0d0d0f;
+    --color-surface: #16161a;
+    --color-surface-sunken: #101014;
+    --color-line: #2a2a31;
+    --color-line-strong: #3a3a44;
+
+    --color-ink: #f2f1ee;
+    --color-ink-soft: #a8a8b3;
+    --color-ink-faint: #74747f;
+
+    --color-accent: #2dd4bf;
+    --color-accent-soft: #10312e;
+    --color-accent-strong: #5eead4;
+
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-raised: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.45);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  /* The stock template hardcoded Arial here, which silently overrode the Geist
+     font the layout goes to the trouble of loading. */
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/**
+ * One focus style for the whole app.
+ *
+ * `:focus-visible` rather than `:focus`, so a mouse click does not leave a ring
+ * behind but a Tab key does. Set globally so no component can forget it — an
+ * invisible focus state makes an app unusable by keyboard while looking
+ * perfectly fine to the person who built it.
+ */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+/* Long descriptions and reasons read better with a little more air than the
+   Tailwind default. */
+.prose-body {
+  line-height: 1.65;
+  max-width: 68ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
