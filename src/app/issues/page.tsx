@@ -5,7 +5,7 @@ import { IssueCard } from "@/components/issue-card";
 import type { IssueStatus } from "@/generated/prisma/enums";
 
 export const metadata = {
-  title: "All reported issues — Community App",
+  title: "All reported issues",
   description: "Every problem reported in the area, and what happened to it.",
 };
 

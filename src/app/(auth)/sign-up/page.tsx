@@ -4,7 +4,7 @@ import { getSessionUser } from "@/lib/guards";
 import { SignUpForm } from "./sign-up-form";
 
 export const metadata = {
-  title: "Create an account — Community App",
+  title: "Create an account",
 };
 
 export default async function SignUpPage() {

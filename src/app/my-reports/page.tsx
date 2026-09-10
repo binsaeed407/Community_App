@@ -5,7 +5,7 @@ import { isOpen } from "@/lib/status";
 import { IssueCard } from "@/components/issue-card";
 
 export const metadata = {
-  title: "My reports — Community App",
+  title: "My reports",
 };
 
 /**

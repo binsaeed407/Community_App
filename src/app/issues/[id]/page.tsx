@@ -12,10 +12,10 @@ import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const issue = await getIssue((await params).id);
-  if (!issue) return { title: "Issue not found — Community App" };
+  if (!issue) return { title: "Issue not found" };
 
   return {
-    title: `${issue.title} — Community App`,
+    title: issue.title,
     description: issue.description.slice(0, 160),
   };
 }

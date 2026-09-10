@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { db } from "@/lib/db";
 
 export const metadata = {
-  title: "Health check — Community App",
+  title: "Health check",
 };
 
 type TableCount = { label: string; count: number };

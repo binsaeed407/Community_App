@@ -4,7 +4,7 @@ import { IssueMapLoader } from "@/components/map/issue-map-loader";
 import { STATUS_LABEL } from "@/lib/status";
 
 export const metadata = {
-  title: "Issue map — Community App",
+  title: "Issue map",
   description: "Every reported problem in the area, on a map.",
 };
 

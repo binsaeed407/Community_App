@@ -4,7 +4,7 @@ import { getSessionUser } from "@/lib/guards";
 import { SignInForm } from "./sign-in-form";
 
 export const metadata = {
-  title: "Sign in — Community App",
+  title: "Sign in",
 };
 
 export default async function SignInPage() {

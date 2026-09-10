@@ -7,7 +7,7 @@ import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
 import type { IssueStatus } from "@/generated/prisma/enums";
 
 export const metadata = {
-  title: "Dashboard — Community App",
+  title: "Dashboard",
 };
 
 type Row = {

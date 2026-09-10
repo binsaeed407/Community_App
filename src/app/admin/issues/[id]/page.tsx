@@ -11,7 +11,7 @@ import { IssueTimeline } from "@/components/issue-timeline";
 import { StatusForm } from "./status-form";
 
 export const metadata = {
-  title: "Manage issue — Community App",
+  title: "Manage issue",
 };
 
 /**

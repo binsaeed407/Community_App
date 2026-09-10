@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Not found — Community App" };
+export const metadata = { title: "Not found" };
 
 /**
  * Shown for a missing page and for any issue id that does not exist.

@@ -4,7 +4,7 @@ import { isCloudinaryConfigured } from "@/lib/cloudinary";
 import { ReportForm } from "./report-form";
 
 export const metadata = {
-  title: "Report a problem — Community App",
+  title: "Report a problem",
 };
 
 /**
