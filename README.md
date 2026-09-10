@@ -16,6 +16,11 @@ public timeline, so anyone can see what actually happened after it was submitted
 These credentials are public on purpose — the point is that you can try the whole thing without
 registering. Browsing reports needs no account at all.
 
+The demo database also contains five other residents who own the rest of the reports. That is
+deliberate: when a single account owned all fifteen, signing in as it showed every report in the
+system under "My reports". The filter was correct — the data made it look like a privacy leak,
+which for an app about trust costs the same as one.
+
 ---
 
 ## Why this project
@@ -44,34 +49,46 @@ and say why.
 been waiting too long, and what was recently closed. Moving an issue between statuses requires
 writing a reason, and marking something resolved requires a photo of the finished work.
 
+**Everywhere**: a light / dark / follow-the-system theme control, a profile page showing what the
+service knows about you and what you have reported, and a layout that uses the whole width of the
+screen instead of a narrow centred column.
+
 ---
 
 ## Architecture
 
 ```
-                        ┌──────────────────────────────┐
-   Browser              │        Vercel (Next.js)      │
-   ───────              │                              │
-   Leaflet map  ───────▶│  Server Components           │
-   (client only)        │    ├─ /issues     public     │
-                        │    ├─ /issues/:id timeline   │
-   Report form  ───────▶│    ├─ /report     guarded    │
-   (server action)      │    └─ /admin      admin only │
-                        │                              │
-                        │  middleware  ── route guard  │
-                        │  server actions ── mutations │
-                        │      │                       │
-                        └──────┼───────────────────────┘
-                               │ Prisma 7 + adapter-pg
-                               ▼
-                        ┌──────────────────────────────┐
-                        │   Neon Postgres (eu-west-2)  │
-                        │                              │
-                        │   User · Category · Issue    │
-                        │   IssueStatusHistory ◀── the │
-                        │   AuditLog · Attachment      │
-                        │   AIAnalysis                 │
-                        └──────────────────────────────┘
+                          ┌────────────────────────────────────┐
+   Browser                │          Vercel (Next.js)          │
+   ───────                │                                    │
+   theme script  ────────▶│  app/layout.tsx                    │
+   (pre-paint, inline)    │    header · footer · theme         │
+                          │                                    │
+   Leaflet map   ────────▶│  app/(app)/layout.tsx   ← sidebar  │
+   (client only, ssr:false)    ├─ /issues        public        │
+                          │    ├─ /issues/:id    timeline      │
+   Report form   ────────▶│    ├─ /issues/map    public        │
+   (server action)        │    ├─ /report        signed in     │
+                          │    ├─ /my-reports    signed in     │
+                          │    ├─ /profile       signed in     │
+                          │    ├─ /admin         admin only    │
+                          │    └─ /health        admin only    │
+                          │                                    │
+                          │  middleware      ── route guard    │
+                          │  requireUser()   ── real check     │
+                          │  server actions  ── every mutation │
+                          │        │                           │
+                          └────────┼───────────────────────────┘
+                                   │ Prisma 7 + adapter-pg
+                                   ▼
+                          ┌────────────────────────────────────┐
+                          │     Neon Postgres (eu-west-2)      │
+                          │                                    │
+                          │   User · Category · Issue          │
+                          │   IssueStatusHistory  ◀── the point │
+                          │   AuditLog · Attachment            │
+                          │   AIAnalysis                       │
+                          └────────────────────────────────────┘
 
    Photos never pass through the server:
    browser ──▶ /api/uploads/sign ──▶ browser ──▶ Cloudinary
@@ -89,6 +106,7 @@ writing a reason, and marking something resolved requires a photo of the finishe
 | Maps | Leaflet + OpenStreetMap | No API key, no credit card, no billing risk |
 | Photos | Cloudinary, signed uploads | The file never touches our server |
 | Category suggestion | A keyword classifier I wrote | No API key, no cost, and every decision is explainable |
+| Theming | `light-dark()` + `color-scheme` | Every colour declared once for both themes, so the two cannot drift |
 | Tests | Vitest | 45 tests on the rules that are easy to break by accident |
 | Hosting | Vercel | Every push to `main` is live in about a minute |
 
@@ -147,6 +165,83 @@ the rules can be read in one sitting and tested exhaustively. Two of them are wo
 
 ---
 
+## How the interface works
+
+### The layout uses the screen
+
+Every page used to sit in a 1024px centred column, which on a 1920px monitor left roughly 450px of
+dead margin on each side. App routes now live in an `(app)` route group with a persistent sidebar
+on large screens and the same navigation as a drawer below that — one `<AppNav>` renders both, so
+there is no desktop copy and mobile copy to fall out of step.
+
+The sidebar only appears once you are signed in. A logged-out reader would get a wall of links they
+cannot use, which is worse than no sidebar at all.
+
+Prose pages stay deliberately narrower. Line length is a legibility constraint, not a stylistic
+one — an issue description 1600px across is genuinely harder to read.
+
+### Three theme states, one definition per colour
+
+Light, dark, and follow-the-system. Three rather than two, because "dark mode on/off" silently
+overrides a choice you already made at the operating-system level and gives you no way back to it.
+
+Almost every implementation of this writes the dark palette out twice — once in a
+`prefers-color-scheme` media query and again under a `[data-theme="dark"]` selector — and the two
+copies drift. This uses `light-dark()` instead: each token declares both values once, and the CSS
+`color-scheme` property decides which applies.
+
+```css
+:root                     { color-scheme: light dark; }  /* follow the OS  */
+:root[data-theme="light"] { color-scheme: light; }       /* forced light   */
+:root[data-theme="dark"]  { color-scheme: dark; }        /* forced dark    */
+
+--app-paper: light-dark(#f7f8fa, #0b0f19);               /* declared once  */
+```
+
+An inline script applies the stored choice before the first paint. It has to be inline and
+synchronous: anything React renders runs after the browser has already drawn the page, and that
+flash is the whole thing it exists to prevent. The toggle reads `localStorage` through
+`useSyncExternalStore`, which is the supported way to read state React does not own, and gets
+cross-tab syncing as a side effect.
+
+### Two Tailwind v4 traps, both hit for real
+
+Worth writing down, because in both cases the source looked correct and only the **built**
+stylesheet showed the problem.
+
+**`@theme` cannot live inside a media query.** Tailwind reads it at build time and collapses it to
+one set of values, so a nested one does not scope — it silently overwrites. That shipped: the
+built CSS contained exactly one definition of `--color-paper`, the dark one, and every visitor got
+dark colours regardless of their setting. The fix is to point `@theme` at plain custom properties
+and let those carry the theme-dependent values.
+
+**`dark:` also compiles to a media query.** So it follows the operating system and ignores an
+in-app toggle. There were 75 `dark:` utilities here — status badges, timeline chips, alert
+panels — and every one would have stayed in system mode while the tokenised colours around them
+switched, breaking the toggle in exactly the places colour carries meaning.
+`@custom-variant dark` redefines it to match the explicit attribute, or the system preference when
+no explicit choice has been made.
+
+### Colour is allowed to mean things
+
+Two colour systems run side by side without colliding, because **shape** keeps them apart: a status
+is always a pill with a dot and a text label, a category is always a rounded square with an emoji.
+
+- **Six status colours** carry the only meaning colour is allowed to carry. SUBMITTED and REJECTED
+  used to be two shades of the same grey, so "nobody has looked at this yet" and "this was
+  considered and closed" — the two states a reporter most needs told apart — were indistinguishable.
+  They are now a cool slate and a warm stone.
+- **Eight category tints** are a taxonomy, not a state. They make a list of grey squares scannable.
+- **One indigo brand colour** for the service and its controls, sitting far enough from every status
+  hue that a primary button is never mistaken for a status.
+
+Colour is never the only signal. Every badge carries its label as text and a solid dot, so the
+system survives greyscale, a screenshot, and a reader who cannot distinguish the hues. Contrast is
+measured rather than eyeballed — a colour that looked fine measured 4.10:1 against the page
+background, failing WCAG AA, and it was the meta line on every single issue card.
+
+---
+
 ## Security notes
 
 Things that are deliberate rather than accidental:
@@ -166,6 +261,9 @@ Things that are deliberate rather than accidental:
   upload with the folder and timestamp already fixed.
 - **Rate limiting is a database count** — five reports per account per hour. No Redis. It counts
   per account rather than per IP, which is worth knowing about.
+- **"My reports" filters in the query**, not in the page, so another user's rows are never loaded
+  into memory in the first place.
+- **The profile page is the only screen that renders an email address**, and only your own.
 
 ---
 
@@ -282,6 +380,24 @@ runtime, in production, with an error message that points nowhere near the cause
 **Deploying on day one was the single best decision.** Every deployment problem I hit was caused by
 the change I had just made, because everything before it was already known to work.
 
+**Read the build output, not the source.** Two theming bugs shipped to production while the source
+looked perfectly correct: a palette that collapsed to one theme, and a dark-mode variant that
+ignored the toggle. Both were obvious the moment I read the generated CSS, and invisible before
+that. Reviewing my own source had already failed to catch either.
+
+**Data that looks broken is broken.** Signing in as the demo citizen showed all fifteen reports
+under "My reports". Nothing was leaking — the query filtered correctly — but one account had been
+seeded as the reporter of everything. For an app whose entire subject is whether a record can be
+trusted, looking like a privacy leak costs the same as being one.
+
+**Never change data behind the app's back.** I deleted some test rows straight from the database,
+which meant `revalidatePath` never ran and the cached page kept serving a report that no longer
+existed. The app is the only thing that knows what to invalidate.
+
+**Measure contrast, do not judge it.** A grey I had chosen by eye for the smallest, most-repeated
+text in the app measured 4.10:1 and failed WCAG AA. It looked fine to me on the monitor I built it
+on, which is exactly the problem.
+
 ---
 
 ## Roadmap
@@ -293,6 +409,8 @@ the change I had just made, because everything before it was already known to wo
 - [x] **Phase 4 — Administrator features.** Dashboard, status changes with reasons, evidence.
 - [x] **Phase 5 — Category suggestion.** Suggests a category, always editable by a human.
 - [x] **Phase 6 — Polish.** Tests, accessibility, documentation.
+- [x] **Interface pass.** Design tokens, light/dark/system theming, sidebar shell, profile page,
+      footer, and a colour system that carries meaning.
 
 Not built, and deliberately so: upvotes, duplicate detection, comments, notifications, analytics.
 Each one is a reasonable idea and none of them make the accountability argument any stronger.
