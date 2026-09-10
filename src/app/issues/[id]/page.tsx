@@ -4,6 +4,7 @@ import { getIssue } from "@/lib/issues";
 import { formatDate, daysSince } from "@/lib/format";
 import { isOpen, isOverdue, STATUS_DESCRIPTION, STATUS_LABEL } from "@/lib/status";
 import { OverdueBadge, StatusBadge } from "@/components/status-badge";
+import { IssueTimeline } from "@/components/issue-timeline";
 import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -123,6 +124,15 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
           </div>
         </section>
       ) : null}
+
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold tracking-tight">What has happened since</h2>
+        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+          Every change to this report, in order, with the reason given at the time. Entries are
+          added, never edited or removed.
+        </p>
+        <IssueTimeline history={issue.history} />
+      </section>
 
       <section className="mt-8">
         <h2 className="text-sm font-medium uppercase tracking-wider text-neutral-500">Location</h2>
