@@ -7,8 +7,12 @@ rubbish — and the relevant local administrator reviews, assigns, updates and r
 Every report gets a public timeline, so anyone can see what actually happened after it was
 submitted.
 
-> **Status: in development.** Phase 0 (foundations) — the app is deployed and the database
-> layer is being wired up. Reporting goes live in a later phase. See [Roadmap](#roadmap).
+**🌍 Live demo: <https://community-app-five-eta.vercel.app>**
+([`/health`](https://community-app-five-eta.vercel.app/health) shows the app reading a row from the database.)
+
+> **Status: in development.** Phase 0 (foundations) is complete — the app is live on Vercel,
+> connected to a Postgres database on Neon, and redeploys automatically on every push to `main`.
+> Reporting itself goes live in a later phase. See [Roadmap](#roadmap).
 
 ---
 
@@ -41,11 +45,11 @@ only way a public timeline can actually be trusted.
 | Database | PostgreSQL (Neon) | Serverless, scales to zero, wakes on request |
 | ORM | Prisma | The schema file doubles as documentation of the data model |
 | Maps | Leaflet + OpenStreetMap | No API key, no billing |
-| AI | Claude (Haiku) | Suggests a category from the description — always editable |
+| Category suggestion | Hand-written keyword classifier | No API key, no cost, and every decision is explainable |
 | Hosting | Vercel | Deploys automatically on every push to `main` |
 
-**Design constraint:** every service used is on a free tier that does not require a credit
-card, and none of them suspend the app for inactivity.
+**Design constraint:** every service used is on a free tier that does not require a credit card,
+and none of them suspend the app for inactivity. Total running cost is £0.00.
 
 ---
 
@@ -101,24 +105,29 @@ the database connection is working.
 
 ## Roadmap
 
-- [ ] **Phase 0 — Foundations.** Next.js scaffold, database connection, deployment pipeline.
+- [x] **Phase 0 — Foundations.** Next.js scaffold, database connection, deployment pipeline.
 - [ ] **Phase 1 — Data model.** Issues, append-only status history, audit log, seed data.
 - [ ] **Phase 2 — Authentication.** Citizen and administrator roles.
 - [ ] **Phase 3 — Citizen features.** Submit a report with a photo and location; browse the map.
 - [ ] **Phase 4 — Administrator features.** Dashboard, status changes with reasons, public updates.
-- [ ] **Phase 5 — AI assistance.** Category suggestion on submission, always editable by a human.
+- [ ] **Phase 5 — Category suggestion.** Suggests a category on submission, always editable by a human.
 - [ ] **Phase 6 — Polish.** Tests, accessibility, documentation.
 
 Later: community upvotes, duplicate detection, comments, notifications, analytics.
 
 ---
 
-## A note on AI in this project
+## A note on automated category suggestion
 
-AI is an **assistive layer, not an authority**. It suggests a category and can summarise a long
-report, but a human always makes the final call. AI never rejects a report, never decides
-priority on its own, and never applies moderation. If the AI service is unavailable, reporting
-still works normally.
+Category suggestion is an **assistive layer, not an authority**. The app suggests a category when
+a report is submitted, but a human always makes the final call — the suggestion is pre-filled and
+editable, never applied silently. It never rejects a report, never decides priority, and never
+applies moderation. If suggestion fails for any reason, reporting still works normally.
+
+The classifier is deliberately **our own code**, not a language-model API: weighted keyword
+matching, written and tuned by hand. It costs nothing, needs no network, and every decision it
+makes can be explained line by line. It sits behind a `suggestCategory()` interface, so a model-
+based classifier could replace it without touching anything else.
 
 ---
 
