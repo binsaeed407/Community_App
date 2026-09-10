@@ -5,6 +5,9 @@ import { formatDate, daysSince } from "@/lib/format";
 import { isOpen, isOverdue, STATUS_DESCRIPTION, STATUS_LABEL } from "@/lib/status";
 import { OverdueBadge, StatusBadge } from "@/components/status-badge";
 import { IssueTimeline } from "@/components/issue-timeline";
+import { ReopenForm } from "@/components/reopen-form";
+import { getSessionUser } from "@/lib/guards";
+import { canTransition } from "@/lib/transitions";
 import { OVERDUE_AFTER_DAYS } from "@/lib/constants";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -25,9 +28,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
  * whether anything actually happened.
  */
 export default async function IssuePage({ params }: { params: Promise<{ id: string }> }) {
-  const issue = await getIssue((await params).id);
+  const [issue, viewer] = await Promise.all([getIssue((await params).id), getSessionUser()]);
 
   if (!issue) notFound();
+
+  // Only the reporter can reopen, and only from a status the rules allow it
+  // from. The server action checks both again; this just decides whether to
+  // show the form at all.
+  const canReopen =
+    viewer?.id === issue.reporter.id && canTransition(issue.status, "REOPENED", "CITIZEN");
 
   const overdue = isOverdue(issue);
   const age = daysSince(issue.createdAt);
@@ -132,6 +141,12 @@ export default async function IssuePage({ params }: { params: Promise<{ id: stri
           added, never edited or removed.
         </p>
         <IssueTimeline history={issue.history} />
+
+        {canReopen ? (
+          <div className="mt-6">
+            <ReopenForm issueId={issue.id} />
+          </div>
+        ) : null}
       </section>
 
       <section className="mt-8">
