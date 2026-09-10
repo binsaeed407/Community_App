@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ButtonLink, Container } from "@/components/ui";
 
 export const metadata = { title: "Not found" };
 
@@ -11,26 +11,18 @@ export const metadata = { title: "Not found" };
  */
 export default function NotFound() {
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-4 px-6 py-16 text-center">
+    <Container size="narrow" className="flex flex-1 flex-col justify-center gap-4 py-24 text-center">
       <p className="text-sm font-medium uppercase tracking-widest text-ink-faint">Not found</p>
       <h1 className="text-2xl font-bold tracking-tight">There is nothing here</h1>
       <p className="text-ink-soft">
         This report may have been removed, or the address may be wrong.
       </p>
       <div className="mt-2 flex flex-wrap justify-center gap-3">
-        <Link
-          href="/issues"
-          className="inline-flex h-10 items-center justify-center rounded-control bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
-        >
-          Browse all issues
-        </Link>
-        <Link
-          href="/report"
-          className="inline-flex h-10 items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-sm font-medium transition-colors hover:bg-surface-sunken"
-        >
+        <ButtonLink href="/issues">Browse all issues</ButtonLink>
+        <ButtonLink href="/report" variant="secondary">
           Report a problem
-        </Link>
+        </ButtonLink>
       </div>
-    </main>
+    </Container>
   );
 }

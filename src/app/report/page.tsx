@@ -2,6 +2,7 @@ import { listCategories } from "@/lib/issues";
 import { requireUser } from "@/lib/guards";
 import { isCloudinaryConfigured } from "@/lib/cloudinary";
 import { ReportForm } from "./report-form";
+import { Container, PageHeader } from "@/components/ui";
 
 export const metadata = {
   title: "Report a problem",
@@ -19,14 +20,14 @@ export default async function ReportPage() {
   const categories = await listCategories();
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">Report a problem</h1>
-      <p className="mt-2 text-ink-soft">
-        This becomes a public record. Anyone can read it, and you will be able to see exactly what
-        happens to it.
-      </p>
+    <Container size="narrow" className="flex-1 py-10">
+      <PageHeader
+        eyebrow="New report"
+        title="Report a problem"
+        description="This becomes a public record. Anyone can read it, and you will be able to see exactly what happens to it."
+      />
 
       <ReportForm categories={categories} uploadsEnabled={isCloudinaryConfigured()} />
-    </main>
+    </Container>
   );
 }

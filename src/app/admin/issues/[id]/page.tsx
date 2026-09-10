@@ -9,6 +9,7 @@ import { isOverdue } from "@/lib/status";
 import { OverdueBadge, StatusBadge } from "@/components/status-badge";
 import { IssueTimeline } from "@/components/issue-timeline";
 import { StatusForm } from "./status-form";
+import { Card, Container } from "@/components/ui";
 
 export const metadata = {
   title: "Manage issue",
@@ -36,7 +37,7 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
   const reported = issue.attachments.filter((a) => a.kind === "REPORT");
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
+    <Container size="prose" className="flex-1 py-10">
       <div className="flex items-center justify-between gap-4">
         <Link href="/admin" className="text-sm underline">
           ← Dashboard
@@ -76,7 +77,7 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
         </div>
       ) : null}
 
-      <section className="mt-10 rounded-card border border-line bg-surface p-5">
+      <Card className="mt-10 p-5">
         <h2 className="text-lg font-semibold tracking-tight">Update this issue</h2>
         <p className="mb-4 mt-1 text-xs text-ink-faint">
           Every change appends to the public timeline and writes an audit entry. Nothing here can
@@ -88,7 +89,7 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
           options={options}
           uploadsEnabled={isCloudinaryConfigured()}
         />
-      </section>
+      </Card>
 
       <section className="mt-10">
         <h2 className="text-lg font-semibold tracking-tight">Public timeline</h2>
@@ -142,6 +143,6 @@ export default async function AdminIssuePage({ params }: { params: Promise<{ id:
           </ul>
         )}
       </section>
-    </main>
+    </Container>
   );
 }

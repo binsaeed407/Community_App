@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/guards";
 import { listIssues } from "@/lib/issues";
 import { isOpen } from "@/lib/status";
 import { IssueCard } from "@/components/issue-card";
+import { ButtonLink, Container, EmptyState, PageHeader } from "@/components/ui";
 
 export const metadata = {
   title: "My reports",
@@ -32,34 +33,28 @@ export default async function MyReportsPage({
   const stillOpen = issues.filter((issue) => isOpen(issue.status)).length;
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">My reports</h1>
-          <p className="mt-1 text-sm text-ink-soft">
-            {total === 0
-              ? "You have not reported anything yet."
-              : `${total} report${total === 1 ? "" : "s"}, ${stillOpen} still open on this page.`}
-          </p>
-        </div>
-        <Link
-          href="/report"
-          className="inline-flex h-9 items-center justify-center rounded-control bg-ink px-3 text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
-        >
-          Report a problem
-        </Link>
-      </div>
+    <Container className="flex-1 py-10">
+      <PageHeader
+        eyebrow="Your account"
+        title="My reports"
+        description={
+          total === 0
+            ? "You have not reported anything yet."
+            : `${total} report${total === 1 ? "" : "s"}, ${stillOpen} still open on this page.`
+        }
+        actions={<ButtonLink href="/report">Report a problem</ButtonLink>}
+      />
 
       {issues.length === 0 ? (
-        <div className="mt-10 rounded-card border border-dashed border-line-strong p-10 text-center">
-          <p className="font-medium">Nothing here yet</p>
-          <p className="mt-1 text-sm text-ink-soft">
+        <div className="mt-8">
+          <EmptyState title="Nothing here yet">
             When you report a problem it will appear here, along with everything that happens to it
-            afterwards.
-          </p>
-          <Link href="/report" className="mt-4 inline-block text-sm underline">
-            Report your first problem
-          </Link>
+            afterwards.{" "}
+            <Link href="/report" className="text-accent underline underline-offset-4">
+              Report your first problem
+            </Link>
+            .
+          </EmptyState>
         </div>
       ) : (
         <ul className="mt-8 flex flex-col gap-3">
@@ -92,6 +87,6 @@ export default async function MyReportsPage({
           )}
         </nav>
       ) : null}
-    </main>
+    </Container>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listIssuesForMap } from "@/lib/issues";
 import { IssueMapLoader } from "@/components/map/issue-map-loader";
 import { STATUS_LABEL } from "@/lib/status";
+import { ButtonLink, Container, PageHeader } from "@/components/ui";
 
 export const metadata = {
   title: "Issue map",
@@ -21,21 +22,20 @@ export default async function IssueMapPage() {
   const issues = await listIssuesForMap();
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Issue map</h1>
-          <p className="mt-1 text-sm text-ink-soft">
-            {issues.length} report{issues.length === 1 ? "" : "s"} across the area.
-          </p>
-        </div>
-        <Link
-          href="/issues"
-          className="inline-flex h-9 items-center justify-center rounded-control border border-line-strong bg-surface px-3 text-sm font-medium transition-colors hover:bg-surface-sunken"
-        >
-          List view
-        </Link>
-      </div>
+    <Container className="flex-1 py-10">
+      <PageHeader
+        eyebrow="Public record"
+        title="Issue map"
+        description={`${issues.length} report${issues.length === 1 ? "" : "s"} across the area. Everything on the map is listed underneath it.`}
+        actions={
+          <>
+            <ButtonLink href="/issues" variant="secondary">
+              List view
+            </ButtonLink>
+            <ButtonLink href="/report">Report a problem</ButtonLink>
+          </>
+        }
+      />
 
       <div className="mt-6">
         <IssueMapLoader issues={issues} />
@@ -64,6 +64,6 @@ export default async function IssueMapPage() {
           ))}
         </ul>
       </section>
-    </main>
+    </Container>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
+import { Button, ButtonLink, Container } from "@/components/ui";
 
 /**
  * The last line of defence for an unhandled error.
@@ -24,7 +24,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-4 px-6 py-16 text-center">
+    <Container size="narrow" className="flex flex-1 flex-col justify-center gap-4 py-24 text-center">
       <p className="text-sm font-medium uppercase tracking-widest text-ink-faint">Error</p>
       <h1 className="text-2xl font-bold tracking-tight">Something went wrong</h1>
       <p className="text-ink-soft">
@@ -35,20 +35,13 @@ export default function Error({
         <p className="font-mono text-xs text-ink-faint">Reference: {error.digest}</p>
       ) : null}
       <div className="mt-2 flex flex-wrap justify-center gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="inline-flex h-10 items-center justify-center rounded-control bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink-soft"
-        >
+        <Button type="button" onClick={reset}>
           Try again
-        </button>
-        <Link
-          href="/issues"
-          className="inline-flex h-10 items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-sm font-medium transition-colors hover:bg-surface-sunken"
-        >
+        </Button>
+        <ButtonLink href="/issues" variant="secondary">
           Back to the issues
-        </Link>
+        </ButtonLink>
       </div>
-    </main>
+    </Container>
   );
 }

@@ -12,7 +12,7 @@ export default async function SignInPage() {
   if (await getSessionUser()) redirect("/");
 
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-6 py-16">
+    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-5 py-16">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
         <p className="mt-2 text-sm text-ink-soft">
@@ -51,6 +51,6 @@ export default async function SignInPage() {
           Create one
         </Link>
       </p>
-    </main>
+    </div>
   );
 }
