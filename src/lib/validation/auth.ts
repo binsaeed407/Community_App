@@ -11,12 +11,20 @@ import { z } from "zod";
 export const MIN_PASSWORD_LENGTH = 8;
 
 export const credentialsSchema = z.object({
-  email: z.email("Enter a valid email address").trim().toLowerCase(),
+  // Normalise BEFORE validating. Chaining .trim() after .email() validates
+  // the raw value, so "  Someone@Example.com " is rejected as malformed
+  // rather than cleaned up — and pasting an address with a trailing space is
+  // exactly what people do.
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email address")),
   password: z.string().min(1, "Enter your password"),
 });
 
 export const signUpSchema = z.object({
-  email: z.email("Enter a valid email address").trim().toLowerCase(),
+  // Normalise BEFORE validating. Chaining .trim() after .email() validates
+  // the raw value, so "  Someone@Example.com " is rejected as malformed
+  // rather than cleaned up — and pasting an address with a trailing space is
+  // exactly what people do.
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email address")),
   displayName: z
     .string()
     .trim()
