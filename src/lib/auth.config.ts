@@ -41,8 +41,12 @@ export const authConfig = {
       const user = auth?.user;
       if (!user) return false;
 
-      if (request.nextUrl.pathname.startsWith("/admin")) {
-        return user.role === "ADMIN";
+      if (request.nextUrl.pathname.startsWith("/admin") && user.role !== "ADMIN") {
+        // Returning false here would send a signed-in citizen to the sign-in
+        // page — which they would complete successfully and be bounced from
+        // again, forever. Signing in is not the problem; not being an
+        // administrator is. Send them somewhere that makes sense instead.
+        return Response.redirect(new URL("/", request.nextUrl));
       }
 
       return true;
